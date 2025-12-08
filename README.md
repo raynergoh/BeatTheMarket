@@ -64,28 +64,25 @@ BeatTheMarket is capable of ingesting data directly from **Interactive Brokers**
 
 ## Future Roadmap
 
-We are constantly improving BeatTheMarket to make it the ultimate retail investor dashboard.
+We are consistently shipping updates. Our priority is **User Experience** -> **Deep Analytics** -> **Expansion**.
 
-### Currency Support
-- Start support for base currencies other than USD (e.g., **SGD**, **EUR**, **GBP**) for users who want to view their net worth in their home currency.
+### 1. Core Experience (High Priority)
+*   **Local Data Persistence**: Implement IndexedDB support so your data stays in your browser. No need to re-upload files on every visit.
+*   **Mobile-First Design (PWA)**: Install BeatTheMarket as an app on your phone for checking Alpha on the go.
+*   **Multi-Currency Engine**: Full support for **SGD**, **EUR**, **GBP**, and **AUD** base currencies.
 
-### Enhanced Benchmarking
-- Support for more indexes beyond S&P 500 (e.g., **Nasdaq 100**, **FTSE All-World**, **STI ETF**).
-- Custom ETF benchmarking (pick any ticker as your benchmark).
+### 2. Advanced Analytics
+*   **Dividend Intelligence**: Calendar view, Yield on Cost tracking, and Dividend Growth visualizations.
+*   **Risk-Adjusted Returns**: Sharpe Ratio, Sortino Ratio, and Max Drawdown stats to see if your Alpha is worth the risk.
+*   **Custom Benchmarking**: Compare against any ticker (QQQ, ARKK, BRK.B), not just indices.
 
-### Extended Broker Support
-We plan to add parsers for other popular retail brokers:
-- **Tiger Brokers**
-- **Moomoo**
-- **Syfe**
-- **Webull**
+### 3. Broker Expansion
+*   **Webull**, **Tiger Brokers**, **Moomoo** support.
+*   **CSV Import**: Generic adapter for custom data import.
 
-### Fundamental Analysis Overlay
-- **Financial Health**: View fundamental metrics for your holdings directly in the dashboard.
-    - **P/E Ratio**
-    - **Free Cash Flow**
-    - **EPS Growth**
-- **Earnings Calendar**: See upcoming earnings interaction for your portfolio.
+### 4. Ecosystem & Insights
+*   **Fundamental Data Overlay**: P/E, PEG, and Earnings dates on your holdings.
+*   **Anonymous Peer Comparison**: See how your Alpha percentile ranks against other users (opt-in).
 
 ## Getting Started
 
