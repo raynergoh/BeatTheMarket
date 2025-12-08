@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 interface FileUploaderProps {
     onFilesSelected: (files: File[]) => void
     acceptedFileTypes?: string // e.g., ".xml"
+    resetOnSelect?: boolean
 }
 
-export function FileUploader({ onFilesSelected, acceptedFileTypes = ".xml" }: FileUploaderProps) {
+export function FileUploader({ onFilesSelected, acceptedFileTypes = ".xml", resetOnSelect = false }: FileUploaderProps) {
     const [dragActive, setDragActive] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const inputRef = useRef<HTMLInputElement>(null)
@@ -30,18 +31,25 @@ export function FileUploader({ onFilesSelected, acceptedFileTypes = ".xml" }: Fi
         setDragActive(false)
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files)
-            const validFiles = newFiles.filter(f => f.name.toLowerCase().endsWith('.xml'))
-            setSelectedFiles(prev => [...prev, ...validFiles])
+            const validFiles = newFiles.filter(f => f.name.toLowerCase().endsWith(acceptedFileTypes.replace('*', '')))
+
+            if (!resetOnSelect) {
+                setSelectedFiles(prev => [...prev, ...validFiles])
+            }
             onFilesSelected(validFiles)
         }
-    }, [onFilesSelected])
+    }, [onFilesSelected, acceptedFileTypes, resetOnSelect])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files)
-            setSelectedFiles(prev => [...prev, ...newFiles])
+            if (!resetOnSelect) {
+                setSelectedFiles(prev => [...prev, ...newFiles])
+            }
             onFilesSelected(newFiles)
+            // Reset input value to allow selecting same file again if needed
+            e.target.value = ''
         }
     }
 

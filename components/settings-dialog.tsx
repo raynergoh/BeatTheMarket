@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Settings, Loader2, CheckCircle2, XCircle, HelpCircle, ChevronLeft, RefreshCw, AlertTriangle, ExternalLink, Trash2, FileText } from "lucide-react"
+import { toast } from "sonner"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
@@ -103,8 +104,17 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
     const handleFilesSelected = async (files: File[]) => {
         let allParsedData: any[] = []
         let successCount = 0;
+        let skippedFiles: string[] = []
+
+        // Get existing filenames
+        const existingNames = new Set(manualFiles.map(f => f.fileName));
 
         for (const file of files) {
+            if (existingNames.has(file.name)) {
+                skippedFiles.push(file.name);
+                continue;
+            }
+
             const text = await file.text()
             try {
                 const parsed = parseIBKRXml(text)
@@ -112,12 +122,14 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                     fileName: file.name,
                     cashTransactions: parsed.cashTransactions,
                     equitySummary: parsed.equitySummary,
-                    openPositions: parsed.openPositions
+                    openPositions: parsed.openPositions,
+                    fromDate: parsed.fromDate,
+                    toDate: parsed.toDate
                 })
                 successCount++;
             } catch (err: any) {
                 console.error(`Failed to parse ${file.name}:`, err)
-                alert(`Failed to parse ${file.name}: ${err.message}`);
+                toast.error(`Failed to parse ${file.name}`, { description: err.message });
             }
         }
 
@@ -137,7 +149,20 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
             const totalEquity = combined.reduce((acc, f) => acc + (f.equitySummary?.length || 0), 0);
             const totalPos = combined.reduce((acc, f) => acc + (f.openPositions?.length || 0), 0);
 
-            alert(`Successfully processed ${successCount} file(s). History saved.\n\nFound:\n- ${totalTrans} Cash Transactions\n- ${totalEquity} Equity/NAV Records\n- ${totalPos} Open Positions`);
+            toast.success(`Successfully processed ${successCount} file(s)`, {
+                description: `Found:\n- ${totalTrans} Cash Transactions\n- ${totalEquity} Equity/NAV Records\n- ${totalPos} Open Positions`,
+                duration: 5000,
+            });
+
+            if (skippedFiles.length > 0) {
+                toast.warning("Duplicate file(s) skipped", {
+                    description: `Already uploaded: ${skippedFiles.join(', ')}`
+                });
+            }
+        } else if (skippedFiles.length > 0) {
+            toast.warning("Duplicate file(s) skipped", {
+                description: `Already uploaded: ${skippedFiles.join(', ')}`
+            });
         }
     }
 
@@ -531,6 +556,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                             <FileUploader
                                 onFilesSelected={handleFilesSelected}
                                 acceptedFileTypes=".xml"
+                                resetOnSelect={true}
                             />
 
                             {manualFiles.length > 0 && (

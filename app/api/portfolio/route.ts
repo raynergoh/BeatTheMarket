@@ -16,7 +16,10 @@ export async function POST(request: Request) {
         let latestOpenPositions: OpenPosition[] = [];
 
         // 1. Process Manual History first (if any)
+        // 1. Process Manual History first (if any)
         if (Array.isArray(manualHistory)) {
+            let maxDateStr = '';
+
             manualHistory.forEach((fileData: any) => {
                 if (fileData.cashTransactions) {
                     allCashTransactions = [...allCashTransactions, ...fileData.cashTransactions];
@@ -24,9 +27,24 @@ export async function POST(request: Request) {
                 if (fileData.equitySummary) {
                     allEquitySummary = [...allEquitySummary, ...fileData.equitySummary];
                 }
-                // Use positions from the last file in the list as "latest" candidate (unless live data overwrites)
+
+                // Smartly determine if this file contains the "latest" positions
+                // We trust the explicitly parsed 'toDate' if available, otherwise fallback to max equity summary date
+                let fileDate = fileData.toDate || '';
+
+                if (!fileDate && fileData.equitySummary && fileData.equitySummary.length > 0) {
+                    // Find max date in equity summary
+                    const dates = fileData.equitySummary.map((e: any) => e.reportDate).sort();
+                    fileDate = dates[dates.length - 1];
+                }
+
+                // If this file has open positions and its date is later than what we've seen so far, use it
                 if (fileData.openPositions && fileData.openPositions.length > 0) {
-                    latestOpenPositions = fileData.openPositions;
+                    // Simple string comparison for YYYY-MM-DD works
+                    if (fileDate >= maxDateStr) {
+                        maxDateStr = fileDate;
+                        latestOpenPositions = fileData.openPositions;
+                    }
                 }
             });
         }
