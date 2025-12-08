@@ -1,0 +1,63 @@
+<FlexQueryResponse>
+<FlexStatements>
+    <FlexStatement fromDate="2024-01-01" toDate="2024-01-31">
+        <CashTransactions>
+            <CashTransaction 
+                amount="1000.00" 
+                currency="USD" 
+                dateTime="2024-01-15;10:00:00" 
+                description="Deposit" 
+                type="Deposits/Withdrawals" 
+                transactionID="TX123" 
+                levelOfDetail="DETAIL"
+            />
+            <CashTransaction 
+                amount="-50.00" 
+                currency="USD" 
+                dateTime="2024-01-20" 
+                description="Withdrawal" 
+                type="Deposits/Withdrawals" 
+                transactionID="TX124" 
+            />
+        </CashTransactions>
+        <OpenPositions>
+            <OpenPosition 
+                symbol="AAPL" 
+                position="10" 
+                costBasisPrice="150.00" 
+                costBasisMoney="1500.00" 
+                markPrice="180.00" 
+                positionValue="1800.00" 
+                currency="USD" 
+                levelOfDetail="SUMMARY" 
+                assetCategory="STK"
+            />
+            <OpenPosition 
+                symbol="GOOGL" 
+                position="5" 
+                costBasisPrice="100.00" 
+                costBasisMoney="500.00" 
+                markPrice="120.00" 
+                positionValue="600.00" 
+                currency="USD" 
+                levelOfDetail="SUMMARY" 
+                assetCategory="STK"
+            />
+            <OpenPosition 
+                symbol="USD" 
+                position="500" 
+                costBasisPrice="1" 
+                costBasisMoney="500" 
+                markPrice="1" 
+                positionValue="500" 
+                currency="USD" 
+                levelOfDetail="SUMMARY" 
+                assetCategory="CASH"
+            />
+        </OpenPositions>
+        <EquitySummaryInBase>
+            <EquitySummaryByReportDateInBase reportDate="2024-01-31" total="2900.00" cash="500.00" />
+        </EquitySummaryInBase>
+    </FlexStatement>
+</FlexStatements>
+</FlexQueryResponse>
