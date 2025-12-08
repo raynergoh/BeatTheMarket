@@ -100,6 +100,7 @@ const ChartTooltipContent = React.forwardRef<
         nameKey?: string
         labelKey?: string
         formatter?: (value: any, name: any, item: any, index: number) => React.ReactNode
+        payload?: any[]
     }
 >(({ active, payload, className, indicator = "dot", hideLabel = false, hideIndicator = false, label, labelFormatter, config, nameKey, labelKey, formatter }, ref) => {
     const { config: configContext } = useChart()
