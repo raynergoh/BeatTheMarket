@@ -26,11 +26,6 @@
 
 <br />
 
-<div align="center" style="display: flex; gap: 10px; justify-content: center;">
-  <img src="public/images/readme/portfolio-allocation.png" alt="Portfolio Allocation" width="48%" />
-  <img src="public/images/readme/geo-breakdown.png" alt="Geographic Allocation" width="48%" />
-</div>
-
 ## Why BeatTheMarket?
 
 Most brokerage platforms (including Interactive Brokers) are great at executing trades but terrible at showing you your **true performance**.
