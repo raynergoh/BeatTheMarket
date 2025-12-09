@@ -74,6 +74,7 @@ We are consistently shipping updates. Our priority is **User Experience** -> **D
 ### 2. Advanced Analytics
 *   **Dividend Intelligence**: Calendar view, Yield on Cost tracking, and Dividend Growth visualizations.
 *   **Risk-Adjusted Returns**: Sharpe Ratio, Sortino Ratio, and Max Drawdown stats to see if your Alpha is worth the risk.
+*   **Per-Position Alpha**: Calculate the exact MWR for each individual holding and compare it to a "Ghost Position" of the benchmark bought at the same times. See exactly which stocks contributed to your outperformance.
 *   **Custom Benchmarking**: Compare against any ticker (QQQ, ARKK, BRK.B), not just indices.
 
 ### 3. Broker Expansion
