@@ -11,7 +11,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { BookOpen, TrendingUp, Activity, Server, ChevronRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Info, TrendingUp, Activity, Server, ChevronRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function GuideModal() {
@@ -39,8 +39,8 @@ export function GuideModal() {
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <BookOpen className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Info className="h-5 w-5" />
                     <span className="sr-only">How it works</span>
                 </Button>
             </DialogTrigger>
