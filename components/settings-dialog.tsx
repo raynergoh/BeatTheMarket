@@ -512,10 +512,10 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                             Official Guide <ExternalLink className="h-3 w-3" />
                                                         </a>
                                                     </div>
-                                                    <p>Follow the steps in the <strong>Auto-Sync (Recommended)</strong> tab to create an <strong>Activity Flex Query</strong> with:</p>
+                                                    <p>Follow the steps in the <strong>Auto-Sync</strong> tab to create an <strong>Activity Flex Query</strong> with:</p>
                                                     <ul className="list-disc pl-4 text-xs space-y-1">
                                                         <li>Format: <strong>XML</strong></li>
-                                                        <li>Sections: <strong>Cash Transactions, NAV in Base, Open Positions</strong></li>
+                                                        <li>Sections: <strong>Cash Report, Cash Transactions, NAV in Base, Open Positions</strong></li>
                                                     </ul>
                                                 </div>
 
