@@ -517,6 +517,44 @@ export async function POST(request: Request) {
             }
         }
 
+        // --- FX Rates for Cash Positions (Native Currency → Target) ---
+        // Cash positions may have value in their native currency (e.g., SGD cash = SGD value),
+        // but the API assumed all values were in base currency. We need to properly convert.
+        const cashCurrencyToTargetRates = new Map<string, number>();
+        const cashCurrencySymbols = ['USD', 'SGD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'JPY', 'KRW'];
+
+        // Identify unique cash currencies that need conversion
+        const uniqueCashCurrencies = new Set<string>();
+        latestOpenPositions.forEach(p => {
+            if (p.assetCategory === 'CASH' || cashCurrencySymbols.includes(p.symbol)) {
+                const nativeCurrency = p.currency || p.symbol;
+                if (nativeCurrency !== targetCurrency) {
+                    uniqueCashCurrencies.add(nativeCurrency);
+                }
+            }
+        });
+
+        // Fetch FX rates for each unique cash currency → target
+        for (const curr of Array.from(uniqueCashCurrencies)) {
+            if (curr === targetCurrency) {
+                cashCurrencyToTargetRates.set(curr, 1);
+            } else {
+                try {
+                    const rates = await getHistoricalFxRates(curr, targetCurrency, new Date(Date.now() - 86400000 * 7), new Date());
+                    if (rates.length > 0) {
+                        cashCurrencyToTargetRates.set(curr, rates[rates.length - 1].rate);
+                        logToFile(`[DEBUG] Cash FX Rate ${curr} -> ${targetCurrency}: ${rates[rates.length - 1].rate}`);
+                    } else {
+                        logToFile(`[WARN] No FX rate found for Cash: ${curr} -> ${targetCurrency}. Using 1.0`);
+                        cashCurrencyToTargetRates.set(curr, 1);
+                    }
+                } catch (e) {
+                    logToFile(`[ERROR] Failed to fetch Cash FX rate for ${curr} -> ${targetCurrency}: ${e}`);
+                    cashCurrencyToTargetRates.set(curr, 1);
+                }
+            }
+        }
+
         const netWorthBase = latestOpenPositions.reduce((sum, p) => sum + p.value, 0) || ([...uniqueEquityMap.values()].pop() || 0);
 
         return NextResponse.json({
@@ -526,16 +564,55 @@ export async function POST(request: Request) {
                 totalDeposited: convertedComparison.length > 0 ? convertedComparison[convertedComparison.length - 1].totalInvested : 0,
                 benchmarkValue: comparisonBase.length > 0 ? (comparisonBase[comparisonBase.length - 1].benchmarkValue * endUsdToTarget) : 0
             },
-            holdings: latestOpenPositions.map(p => ({
-                ...p,
-                symbol: p.symbol === 'CSSPXz' ? 'CSPX.L' : p.symbol,
-                value: p.value * endBaseToTarget, // Display in Target (SGD)
-                costBasisMoney: p.costBasisMoney * endBaseToTarget, // Display in Target (SGD)
-                markPrice: p.markPrice, // Keep in Native (e.g. CAD, USD)
-                costBasisPrice: p.costBasisPrice, // Keep in Native (e.g. CAD, USD)
-                currency: p.currency, // Native currency (e.g. CAD)
-                displayCurrency: targetCurrency // Target currency (e.g. SGD) for Value/TotalCost
-            })),
+            holdings: latestOpenPositions.map(p => {
+                const isCash = p.assetCategory === 'CASH' || cashCurrencySymbols.includes(p.symbol);
+                const nativeCurrency = p.currency || p.symbol;
+
+                // For stocks: always use base→target conversion
+                // For cash: determine if value is already in base currency or still in native currency
+                // 
+                // Cash positions from granular cash reports have:
+                //   - value = quantity * rateToBase (already in base currency)
+                //   - For non-base currency: value !== quantity
+                //   - For base currency: value === quantity
+                //
+                // Cash positions from original data (no granular processing) have:
+                //   - value = quantity (still in native currency)
+                //
+                // Detection: If cash currency !== base AND value ≈ quantity, it's native (not converted)
+                let conversionRate = endBaseToTarget;
+
+                if (isCash) {
+                    const isNativeCurrencyDifferentFromBase = nativeCurrency !== detectedBaseCurrency;
+                    const valueEqualsQuantity = Math.abs(p.value - p.quantity) < 0.01;
+
+                    // If value ≈ quantity AND currency differs from base, value is in native currency
+                    // So we need native→target conversion
+                    const valueIsInNativeCurrency = isNativeCurrencyDifferentFromBase && valueEqualsQuantity;
+
+                    if (nativeCurrency === targetCurrency && valueIsInNativeCurrency) {
+                        // Native currency matches target, no conversion needed
+                        conversionRate = 1;
+                    } else if (valueIsInNativeCurrency) {
+                        // Value is in native currency, convert native→target
+                        conversionRate = cashCurrencyToTargetRates.get(nativeCurrency) || 1;
+                    } else {
+                        // Value is already in base currency (from granular processing), use base→target
+                        conversionRate = endBaseToTarget;
+                    }
+                }
+
+                return {
+                    ...p,
+                    symbol: p.symbol === 'CSSPXz' ? 'CSPX.L' : p.symbol,
+                    value: p.value * conversionRate, // Display in Target
+                    costBasisMoney: p.costBasisMoney * conversionRate, // Display in Target
+                    markPrice: p.markPrice, // Keep in Native (e.g. CAD, USD)
+                    costBasisPrice: p.costBasisPrice, // Keep in Native (e.g. CAD, USD)
+                    currency: p.currency, // Native currency (e.g. CAD)
+                    displayCurrency: targetCurrency // Target currency (e.g. SGD) for Value/TotalCost
+                };
+            }),
             categories,
             debugDeposits: effectiveDeposits.map(d => {
                 let amount = d.amount * endUsdToTarget; // Convert Base (USD) to Target
