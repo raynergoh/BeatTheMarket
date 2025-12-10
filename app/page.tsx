@@ -44,7 +44,19 @@ interface PortfolioSummary {
   totalDeposited: number;
 }
 
-export default function Dashboard() {
+import { CurrencyProvider, useCurrency } from "@/components/currency-context";
+import { CurrencyDropdown } from "@/components/currency-dropdown";
+
+export default function DashboardPage() {
+  return (
+    <CurrencyProvider>
+      <DashboardContent />
+    </CurrencyProvider>
+  );
+}
+
+function DashboardContent() {
+  const { targetCurrency, setBaseCurrency, currencySymbol } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [comparisonData, setComparisonData] = useState<ComparisonPoint[]>([]);
@@ -79,7 +91,12 @@ export default function Dashboard() {
       const res = await fetch('/api/portfolio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, queryId, manualHistory })
+        body: JSON.stringify({
+          token,
+          queryId,
+          manualHistory,
+          targetCurrency
+        })
       });
 
       if (!res.ok) {
@@ -95,6 +112,10 @@ export default function Dashboard() {
       setDebugDeposits(responseData.debugDeposits || []);
       setWarnings(responseData.warnings || []);
 
+      if (responseData.baseCurrency) {
+        setBaseCurrency(responseData.baseCurrency);
+      }
+
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -104,7 +125,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [targetCurrency]); // Re-fetch when currency changes
 
   // Format comparison data for chart
   const chartData = comparisonData.map(d => ({
@@ -192,15 +213,7 @@ export default function Dashboard() {
             />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Select defaultValue="usd">
-              <SelectTrigger className="h-8 w-[85px]">
-                <SelectValue placeholder="Currency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="usd">USD</SelectItem>
-                <SelectItem value="sgd">SGD</SelectItem>
-              </SelectContent>
-            </Select>
+            <CurrencyDropdown />
             <ModeToggle />
             <GuideModal />
             <SettingsDialog onSettingsChanged={fetchData} />
@@ -238,6 +251,7 @@ export default function Dashboard() {
                 annualizedMwr={annualizedMwr}
                 benchmarkMwr={benchmarkMwr}
                 annualizedBenchmarkMwr={annualizedBenchmarkMwr}
+                currencySymbol={currencySymbol}
               />
 
               {/* Row 2: Performance Chart (Full Width) */}
@@ -245,10 +259,12 @@ export default function Dashboard() {
                 data={chartData}
                 debugDeposits={debugDeposits}
                 selectedBenchmark={selectedBenchmark}
+                currencySymbol={currencySymbol}
+                targetCurrency={targetCurrency}
               />
 
               {/* Row 3: Split View - 50/50 */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+              <div className="grid flex-col lg:grid-cols-2 gap-4 md:gap-8">
                 {/* Left Column: Holdings & Cash (50%) */}
                 <div className="flex flex-col gap-4 w-full">
                   <CashHoldings holdings={holdings} totalNetWorth={summary.netWorth} />

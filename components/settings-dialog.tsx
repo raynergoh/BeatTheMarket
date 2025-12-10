@@ -123,6 +123,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                     cashTransactions: parsed.cashTransactions,
                     equitySummary: parsed.equitySummary,
                     openPositions: parsed.openPositions,
+                    cashReports: parsed.cashReports,
                     fromDate: parsed.fromDate,
                     toDate: parsed.toDate
                 })
@@ -366,7 +367,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                     <div className="flex items-center gap-2">
                                         <Button
                                             type="button"
-                                            variant="secondary"
+                                            variant="outline"
                                             size="sm"
                                             onClick={handleTestConnection}
                                             disabled={testing || !token || !queryId}
@@ -435,6 +436,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                 <p className="font-medium text-foreground">Step 3: Select Sections</p>
                                                 <p>Enable the following sections and check <strong>Select All</strong> for each:</p>
                                                 <ul className="list-disc pl-4 space-y-1 text-xs">
+                                                    <li><strong>Cash Report</strong></li>
                                                     <li><strong>Cash Transactions</strong></li>
                                                     <li><strong>Net Asset Value (NAV) in Base</strong> (search under Equity Summary)</li>
                                                     <li><strong>Open Positions</strong></li>

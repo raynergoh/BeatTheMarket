@@ -107,22 +107,23 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                             const allocation = totalValue > 0 ? (safeValue / totalValue) * 100 : 0;
 
                             // Determine currency for formatting
-                            const currency = (stock.currency && stock.currency !== 'Base') ? stock.currency : 'USD';
+                            const nativeCurrency = (stock.currency && stock.currency !== 'Base') ? stock.currency : 'USD';
+                            const displayCurrency = (stock as any).displayCurrency || 'USD'; // Fallback to USD if not provided
 
                             return (
                                 <TableRow key={`${stock.symbol}-${index}`}>
                                     <TableCell className="font-medium">{stock.symbol}</TableCell>
                                     <TableCell className="text-right hidden md:table-cell">
-                                        {safeMarkPrice.toLocaleString('en-US', { style: 'currency', currency: currency })}
+                                        {safeMarkPrice.toLocaleString('en-US', { style: 'currency', currency: nativeCurrency })}
                                     </TableCell>
                                     <TableCell className="text-right text-muted-foreground hidden md:table-cell">
-                                        {safeAvgCost.toLocaleString('en-US', { style: 'currency', currency: currency })}
+                                        {safeAvgCost.toLocaleString('en-US', { style: 'currency', currency: nativeCurrency })}
                                     </TableCell>
                                     <TableCell className="text-right font-medium">
-                                        {safeValue.toLocaleString('en-US', { style: 'currency', currency: currency })}
+                                        {safeValue.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
                                     </TableCell>
                                     <TableCell className="text-right text-muted-foreground hidden md:table-cell">
-                                        {safeCostBasis.toLocaleString('en-US', { style: 'currency', currency: currency })}
+                                        {safeCostBasis.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
                                     </TableCell>
                                     <TableCell className={`text-right ${plPercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                         {plPercent >= 0 ? '+' : ''}{plPercent.toFixed(1)}%

@@ -19,11 +19,19 @@ export interface PerformanceChartProps {
     data: PortfolioData[];
     debugDeposits?: any[];
     selectedBenchmark: string;
+    currencySymbol?: string;
+    targetCurrency?: string;
 }
 
 type TimeRange = "1M" | "YTD" | "1Y" | "5Y" | "ALL";
 
-export function PerformanceChart({ data, debugDeposits = [], selectedBenchmark }: PerformanceChartProps) {
+export function PerformanceChart({
+    data,
+    debugDeposits = [],
+    selectedBenchmark,
+    currencySymbol = '$',
+    targetCurrency = 'USD'
+}: PerformanceChartProps) {
     const [timeRange, setTimeRange] = React.useState<TimeRange>("ALL");
 
     const chartConfig = {
@@ -151,7 +159,12 @@ export function PerformanceChart({ data, debugDeposits = [], selectedBenchmark }
                             ))}
                         </div>
 
-                        <DataVerificationDialog data={data} deposits={debugDeposits} />
+                        <DataVerificationDialog
+                            data={data}
+                            deposits={debugDeposits}
+                            currencySymbol={currencySymbol}
+                            targetCurrency={targetCurrency}
+                        />
                     </div>
                 </div>
                 {/* Mobile metrics view */}
@@ -201,7 +214,7 @@ export function PerformanceChart({ data, debugDeposits = [], selectedBenchmark }
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `$${value}`}
+                                tickFormatter={(value) => `${currencySymbol}${value}`}
                             />
                             <ChartTooltip
                                 cursor={false}
@@ -209,7 +222,7 @@ export function PerformanceChart({ data, debugDeposits = [], selectedBenchmark }
                                     <ChartTooltipContent
                                         indicator="dot"
                                         labelFormatter={(value) => new Date(value).toLocaleDateString()}
-                                        formatter={(value) => `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                        formatter={(value) => `${currencySymbol}${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                     />
                                 }
                             />

@@ -12,7 +12,11 @@ interface CashHoldingsProps {
     totalNetWorth: number; // To calculate % of portfolio if needed, or check for consistency
 }
 
+import { useCurrency } from "@/components/currency-context";
+
 export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
+    const { targetCurrency, currencySymbol } = useCurrency();
+
     // Filter for cash
     const cashPositions = React.useMemo(() => {
         return holdings.filter(p =>
@@ -25,30 +29,30 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
 
     // Aggregate by currency (in case of mult-account or split rows)
     const aggregatedCash = React.useMemo(() => {
-        const map = new Map<string, { amount: number, valueUSD: number }>();
+        const map = new Map<string, { amount: number, value: number }>();
 
         cashPositions.forEach(p => {
             const curr = p.currency || p.symbol; // Fallback
-            const existing = map.get(curr) || { amount: 0, valueUSD: 0 };
+            const existing = map.get(curr) || { amount: 0, value: 0 };
 
             map.set(curr, {
                 amount: existing.amount + p.quantity,
-                valueUSD: existing.valueUSD + p.value
+                value: existing.value + p.value // p.value is already converted to Target by backend
             });
         });
 
         return Array.from(map.entries()).map(([currency, data]) => ({
             currency,
             amount: data.amount,
-            valueUSD: data.valueUSD
+            value: data.value
         }));
 
     }, [cashPositions]);
 
-    const totalCashUSD = aggregatedCash.reduce((sum, item) => sum + item.valueUSD, 0);
+    const totalCash = aggregatedCash.reduce((sum, item) => sum + item.value, 0);
 
-    if (aggregatedCash.length === 0 && totalCashUSD === 0) {
-        return null;
+    if (aggregatedCash.length === 0 && totalCash === 0) {
+        return null; // Or return empty state
     }
 
     return (
@@ -62,7 +66,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                                 <Info className="h-4 w-4 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Cash balances in different currencies converted to base currency (USD).</p>
+                                <p>Cash balances in different currencies converted to {targetCurrency}.</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -74,7 +78,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                         <TableRow>
                             <TableHead className="w-[100px]">Currency</TableHead>
                             <TableHead className="text-right hidden sm:table-cell">Amount</TableHead>
-                            <TableHead className="text-right">Value (USD)</TableHead>
+                            <TableHead className="text-right">Value ({targetCurrency})</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -88,15 +92,15 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                                     {item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </TableCell>
                                 <TableCell className="text-right text-muted-foreground">
-                                    ${item.valueUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {currencySymbol}{item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </TableCell>
                             </TableRow>
                         ))}
                         <TableRow className="bg-muted/50 font-bold">
-                            <TableCell>Total Cash (USD)</TableCell>
+                            <TableCell>Total Cash</TableCell>
                             <TableCell className="text-right hidden sm:table-cell"></TableCell>
                             <TableCell className="text-right">
-                                ${totalCashUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {currencySymbol}{totalCash.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </TableCell>
                         </TableRow>
                     </TableBody>

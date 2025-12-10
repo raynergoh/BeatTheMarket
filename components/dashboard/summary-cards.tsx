@@ -24,6 +24,7 @@ interface SummaryCardsProps {
     annualizedMwr?: number;
     benchmarkMwr?: number;
     annualizedBenchmarkMwr?: number;
+    currencySymbol?: string;
 }
 
 export function SummaryCards({
@@ -35,11 +36,10 @@ export function SummaryCards({
     mwr = 0,
     annualizedMwr = 0,
     benchmarkMwr = 0,
-    annualizedBenchmarkMwr = 0
+    annualizedBenchmarkMwr = 0,
+    currencySymbol = '$'
 }: SummaryCardsProps) {
     const pl = netWorth - totalDeposited;
-    // const benchmarkPL = benchmarkValue - totalDeposited;
-    // const benchmarkMWR = totalDeposited > 0 ? (benchmarkPL / totalDeposited) * 100 : 0;
     const alpha = mwr - benchmarkMwr;
     const annualizedAlpha = annualizedMwr - annualizedBenchmarkMwr;
 
@@ -53,9 +53,9 @@ export function SummaryCards({
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="text-xl sm:text-2xl font-bold">{currencySymbol}{netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <p className="text-xs text-muted-foreground">
-                        Total Deposited: ${totalDeposited.toLocaleString()}
+                        Total Deposited: {currencySymbol}{totalDeposited.toLocaleString()}
                     </p>
                 </CardContent>
             </Card>
@@ -70,7 +70,7 @@ export function SummaryCards({
                 </CardHeader>
                 <CardContent>
                     <div className={`text-xl sm:text-2xl font-bold ${pl >= 0 ? "text-green-500" : "text-red-500"}`}>
-                        {pl >= 0 ? "+" : ""}${Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {pl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <TooltipProvider>
                         <Tooltip>
@@ -159,7 +159,7 @@ export function SummaryCards({
                     </Select>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">${benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="text-xl sm:text-2xl font-bold">{currencySymbol}{benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <p className="text-xs text-muted-foreground">
                         if invested in {selectedBenchmark === 'sp500' ? 'S&P 500' : selectedBenchmark.toUpperCase()}
                     </p>

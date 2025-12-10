@@ -45,7 +45,7 @@ export interface PortfolioData {
     totalInvested: number;
 }
 
-export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransaction[], openPositions: OpenPosition[], equitySummary: EquitySummary[], fromDate: string, toDate: string } {
+export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransaction[], openPositions: OpenPosition[], equitySummary: EquitySummary[], fromDate: string, toDate: string, baseCurrency: string, cashReports: CashReport[] } {
     const parser = new XMLParser({
         ignoreAttributes: false,
         attributeNamePrefix: "",
@@ -63,6 +63,12 @@ export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransa
     const toArray = (item: any) => {
         if (!item) return [];
         return Array.isArray(item) ? item : [item];
+    };
+
+    // Helper to format YYYYMMDD to YYYY-MM-DD
+    const formatIbkrDate = (dateStr: string) => {
+        if (!dateStr || dateStr.length !== 8) return dateStr;
+        return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
     };
 
     // Navigate the XML structure
@@ -181,7 +187,7 @@ export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransa
 
         for (const item of equityList) {
             equitySummary.push({
-                reportDate: item.reportDate,
+                reportDate: formatIbkrDate(item.reportDate),
                 total: parseFloat(item.total),
                 cash: parseFloat(item.cash || '0'),
                 currency: currency
@@ -203,7 +209,7 @@ export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransa
             for (const item of navList) {
                 const val = parseFloat(item.total || item.netLiquidation || item.nav || item.amount || '0');
                 equitySummary.push({
-                    reportDate: item.reportDate || item.date, // 'date' is sometimes used
+                    reportDate: formatIbkrDate(item.reportDate || item.date), // 'date' is sometimes used
                     total: val,
                     cash: parseFloat(item.cash || '0'), // Try to get cash if available in NAV too
                     currency: navCurrency
@@ -243,16 +249,35 @@ export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransa
         }
     }
 
+
+
     // Extract Report Metadata (fromDate/toDate)
     let fromDate = '';
     let toDate = '';
+    let baseCurrency = 'USD'; // Default
 
     if (flexStatements.length > 0) {
         // Usually attributes are directly on the statement object if using fast-xml-parser with ignoreAttributes: false
         // The parser usually prefixes attributes, but we set attributeNamePrefix: ""
         const stmt = flexStatements[0];
-        fromDate = stmt.fromDate || '';
-        toDate = stmt.toDate || '';
+        fromDate = formatIbkrDate(stmt.fromDate || '');
+        toDate = formatIbkrDate(stmt.toDate || '');
+
+        // Try to detect base currency from statement or equity summary sections
+        // Option 1: Statement level (sometimes present)
+        if (stmt.currency) baseCurrency = stmt.currency;
+
+        // Option 2: EquitySummaryInBase currency attribute
+        // <EquitySummaryInBase currency="SGD">
+        else if (stmt.EquitySummaryInBase?.currency) baseCurrency = stmt.EquitySummaryInBase.currency;
+
+        // Option 3: NetAssetValueInBase currency attribute
+        else if (stmt.NetAssetValueInBase?.currency) baseCurrency = stmt.NetAssetValueInBase.currency;
+
+        // Option 4: Check if we have any equity summary items with currency
+        else if (equitySummary.length > 0 && equitySummary[0].currency) {
+            baseCurrency = equitySummary[0].currency;
+        }
     }
 
     // Extract Cash Report (for accurate currency breakdown)
@@ -260,66 +285,23 @@ export function parseIBKRXml(xmlContent: string): { cashTransactions: CashTransa
     let cashReports: CashReport[] = [];
     if (flexStatements.length > 0) {
         flexStatements.forEach(statement => {
-            const reports = toArray(statement.CashReport?.CashReportCurrency);
-            reports.forEach((r: any) => {
-                cashReports.push({
-                    currency: r.currency,
-                    totalCash: parseFloat(r.totalCash || r.endingCash || '0'), // 'endingCash' is common in CashReport
-                    settledCash: parseFloat(r.settledCash || '0'),
-                    accruedCash: parseFloat(r.accruedCash || '0')
-                });
-            });
-        });
-    }
+            const reportWrapper = statement.CashReport;
+            if (reportWrapper) {
+                const reports = toArray(reportWrapper.CashReportCurrency);
+                reports.forEach((r: any) => {
+                    // Filter out BASE_SUMMARY if present, as it overlaps with specific currencies
+                    if (r.currency === 'BASE_SUMMARY') return;
 
-    // Merge CashReport into OpenPositions if we have it
-    // This provides better breakdown than just one "CASH" summary
-    if (cashReports.length > 0) {
-        // Remove generic synthesized CASH position if we have specific reports
-        // But keep explicit currency positions from OpenPositions if they exist (they might be more accurate for 'trade' purposes)
-        // Actually, CashReport is usually the authority on *balances*.
-
-        // Let's add separate CASH positions for each currency in CashReport
-        cashReports.forEach((cr) => {
-            // Check if we already have this currency position
-            const existing = openPositions.find(p => p.currency === cr.currency && (p.assetCategory === 'CASH' || p.symbol === 'CASH' || p.symbol === cr.currency));
-
-            if (!existing) {
-                // Only add if non-zero
-                if (Math.abs(cr.totalCash) > 0.01) {
-                    openPositions.push({
-                        symbol: cr.currency, // Use currency as symbol for display
-                        quantity: cr.totalCash,
-                        costBasisPrice: 1,
-                        costBasisMoney: cr.totalCash,
-                        markPrice: 1, // We don't have fx rate here easily unless we lookup fxRateToBase
-                        value: cr.totalCash, // WARNING: This is in local currency. We need valueInBase.
-                        // But wait, OpenPositions usually expects 'value' to be in Base if we want to sum net worth?
-                        // IBKR OpenPositions usually gives 'positionValue' in Base? Or Local?
-                        // 'positionValue' in OpenPositions is usually PRE-CONVERTED to base? Or not?
-                        // Actually, standard positions have 'positionValue' (local) and 'markPrice'. 
-                        // But for portfolio sum, we usually want Base.
-
-                        // Issue: We don't know the FX rate here to convert to Base (USD).
-                        // However, for the "Cash Holdings" card, we want to show the specific currency amount.
-                        // We can flag it.
-                        currency: cr.currency,
-                        percentOfNAV: 0,
-                        levelOfDetail: 'SUMMARY',
-                        assetCategory: 'CASH'
+                    cashReports.push({
+                        currency: r.currency,
+                        totalCash: parseFloat(r.totalCash || r.endingCash || '0'),
+                        settledCash: parseFloat(r.settledCash || r.endingSettledCash || r.endingCash || '0'),
+                        accruedCash: parseFloat(r.accruedCash || '0')
                     });
-
-                    // NOTE: The value here is in LOCAL currency. 
-                    // CashHoldings component needs to handle conversion or display.
-                    // But wait, CashHoldings logic sums 'value'. If 'value' is local, the sum will be wrong.
-                    // WE NEED FX RATES. 
-
-                    // Attempt to get FX rate from OpenPositions or ConversionRates?
-                    // If we don't have it, we might be stuck showing 0 USD value or 1:1 (wrong).
-                }
+                });
             }
         });
     }
 
-    return { cashTransactions, openPositions, equitySummary, fromDate, toDate };
+    return { cashTransactions, openPositions, equitySummary, fromDate, toDate, baseCurrency, cashReports };
 }

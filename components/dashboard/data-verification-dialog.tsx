@@ -38,9 +38,16 @@ interface DepositDebug {
 interface DataVerificationDialogProps {
     data: VerificationData[];
     deposits?: DepositDebug[];
+    currencySymbol?: string;
+    targetCurrency?: string;
 }
 
-export function DataVerificationDialog({ data, deposits = [] }: DataVerificationDialogProps) {
+export function DataVerificationDialog({
+    data,
+    deposits = [],
+    currencySymbol = '$',
+    targetCurrency = 'USD'
+}: DataVerificationDialogProps) {
     const handleCopy = () => {
         // Convert to CSV
         const header = "Date,Portfolio Value,Benchmark Value,Net Deposits\n";
@@ -90,9 +97,9 @@ export function DataVerificationDialog({ data, deposits = [] }: DataVerification
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Date</TableHead>
-                                        <TableHead className="text-right">Portfolio Value</TableHead>
-                                        <TableHead className="text-right">Benchmark (SPY)</TableHead>
-                                        <TableHead className="text-right">Net Deposits</TableHead>
+                                        <TableHead className="text-right">Portfolio Value ({targetCurrency})</TableHead>
+                                        <TableHead className="text-right">Benchmark (SPY) ({targetCurrency})</TableHead>
+                                        <TableHead className="text-right">Net Deposits ({targetCurrency})</TableHead>
                                         <TableHead className="text-right">Difference</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -101,16 +108,16 @@ export function DataVerificationDialog({ data, deposits = [] }: DataVerification
                                         <TableRow key={row.date}>
                                             <TableCell>{row.date}</TableCell>
                                             <TableCell className="text-right">
-                                                {row.portfolioValue?.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                {currencySymbol}{row.portfolioValue?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {row.benchmarkValue?.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                {currencySymbol}{row.benchmarkValue?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {row.totalInvested?.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                {currencySymbol}{row.totalInvested?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </TableCell>
                                             <TableCell className="text-right text-muted-foreground text-xs">
-                                                {((row.portfolioValue || 0) - row.benchmarkValue).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                {currencySymbol}{((row.portfolioValue || 0) - row.benchmarkValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -134,7 +141,7 @@ export function DataVerificationDialog({ data, deposits = [] }: DataVerification
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Date</TableHead>
-                                        <TableHead>USD Amount</TableHead>
+                                        <TableHead>{targetCurrency} Amount</TableHead>
                                         <TableHead>Original</TableHead>
                                         <TableHead>Type</TableHead>
                                         <TableHead>Description</TableHead>
@@ -145,10 +152,10 @@ export function DataVerificationDialog({ data, deposits = [] }: DataVerification
                                         <TableRow key={i}>
                                             <TableCell>{d.date}</TableCell>
                                             <TableCell className="font-medium text-green-600">
-                                                {d.amount?.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                {currencySymbol}{d.amount?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
-                                                {d.originalAmount && d.currency && d.currency !== 'USD' ? (
+                                                {d.originalAmount && d.currency && d.currency !== targetCurrency ? (
                                                     `${d.originalAmount.toLocaleString()} ${d.currency}`
                                                 ) : '-'}
                                             </TableCell>
