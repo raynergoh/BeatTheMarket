@@ -68,12 +68,12 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Current Holdings</CardTitle>
+        <Card className="min-w-0 overflow-hidden">
+            <CardHeader className="px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">Current Holdings</CardTitle>
             </CardHeader>
-            <CardContent>
-                <Table>
+            <CardContent className="px-2 sm:px-6">
+                <Table className="text-xs sm:text-sm">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Symbol</TableHead>
@@ -81,7 +81,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                             <TableHead className="text-right hidden md:table-cell">Avg Cost</TableHead>
                             <TableHead className="text-right">Value</TableHead>
                             <TableHead className="text-right hidden md:table-cell">Cost Basis</TableHead>
-                            <TableHead className="text-right cursor-pointer group hover:bg-muted/50 transition-colors" onClick={() => requestSort('pl')}>
+                            <TableHead className="text-right cursor-pointer group hover:bg-muted/50 transition-colors hidden sm:table-cell" onClick={() => requestSort('pl')}>
                                 <div className="flex items-center justify-end">
                                     P/L %
                                     {getSortIcon('pl')}
@@ -89,7 +89,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                             </TableHead>
                             <TableHead className="text-right cursor-pointer group hover:bg-muted/50 transition-colors" onClick={() => requestSort('allocation')}>
                                 <div className="flex items-center justify-end">
-                                    Allocation
+                                    Alloc
                                     {getSortIcon('allocation')}
                                 </div>
                             </TableHead>
@@ -125,7 +125,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                                     <TableCell className="text-right text-muted-foreground hidden md:table-cell">
                                         {safeCostBasis.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
                                     </TableCell>
-                                    <TableCell className={`text-right ${plPercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    <TableCell className={`text-right hidden sm:table-cell ${plPercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                         {plPercent >= 0 ? '+' : ''}{plPercent.toFixed(1)}%
                                     </TableCell>
                                     <TableCell className="text-right text-muted-foreground">

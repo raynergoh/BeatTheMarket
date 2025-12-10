@@ -117,7 +117,7 @@ export function PerformanceChart({
     }, [filteredData]);
 
     return (
-        <Card className="col-span-4">
+        <Card className="w-full min-w-0 overflow-hidden">
             <CardHeader>
                 <div className="flex flex-row items-start justify-between lg:items-center">
                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -183,7 +183,7 @@ export function PerformanceChart({
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="pl-2">
+            <CardContent className="px-2 sm:px-6">
                 <div className="h-[400px] w-full">
                     <ChartContainer config={chartConfig} className="h-full w-full">
                         <AreaChart data={filteredData}>
@@ -211,10 +211,16 @@ export function PerformanceChart({
                             <YAxis
                                 domain={['auto', 'auto']}
                                 stroke="#888888"
-                                fontSize={12}
+                                fontSize={10}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${currencySymbol}${value}`}
+                                width={30}
+                                tickFormatter={(value) => {
+                                    if (value >= 1000) {
+                                        return `${Math.round(value / 1000)}k`;
+                                    }
+                                    return `${value}`;
+                                }}
                             />
                             <ChartTooltip
                                 cursor={false}
@@ -226,7 +232,7 @@ export function PerformanceChart({
                                     />
                                 }
                             />
-                            <Legend />
+                            <Legend wrapperStyle={{ marginTop: '10px' }} />
                             <Area
                                 type="monotone"
                                 dataKey="portfolioValue"

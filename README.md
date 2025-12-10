@@ -44,6 +44,7 @@ Most brokerage platforms (including Interactive Brokers) are great at executing 
     - **Geographic Breakdown**: Visualise your global exposure.
     - **Asset Class**: Equity, Cash, Options, etc.
 - **Multi-Currency Logic**: View your portfolio in **USD**, **SGD**, **EUR**, or **GBP**. Automatically handles currency conversions for accurate Net Worth and Performance tracking, with granular cash reporting.
+- **Mobile-Responsive Design**: Fully optimized for mobile devices, tablets, and desktops. Check your Alpha on the go with a clean, compact interface.
 
 ## How It Works
 
@@ -68,7 +69,7 @@ We are consistently shipping updates. Our priority is **User Experience** -> **D
 
 ### 1. Core Experience (High Priority)
 *   **Local Data Persistence**: Implement IndexedDB support so your data stays in your browser. No need to re-upload files on every visit.
-*   **Mobile-First Design (PWA)**: Install BeatTheMarket as an app on your phone for checking Alpha on the go.
+*   **PWA Support**: Install BeatTheMarket as a Progressive Web App for offline access.
 
 
 ### 2. Advanced Analytics

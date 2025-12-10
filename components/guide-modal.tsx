@@ -39,7 +39,7 @@ export function GuideModal() {
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                     <BookOpen className="h-5 w-5" />
                     <span className="sr-only">How it works</span>
                 </Button>
@@ -116,7 +116,7 @@ export function GuideModal() {
                         )}      </div>
                 </div>
 
-                <DialogFooter className="flex sm:justify-between items-center sm:flex-row flex-col-reverse gap-2">
+                <DialogFooter className="flex justify-between items-center flex-row gap-2">
                     <Button
                         variant="ghost"
                         onClick={() => setOpen(false)}
@@ -125,7 +125,7 @@ export function GuideModal() {
                         Skip Guide
                     </Button>
 
-                    <Button onClick={handleNext} className="w-full sm:w-auto min-w-[100px]">
+                    <Button onClick={handleNext} className="min-w-[80px] sm:min-w-[100px]">
                         {step === totalSteps - 1 ? (
                             <>
                                 Got it <CheckCircle2 className="ml-2 h-4 w-4" />

@@ -76,13 +76,13 @@ export function DataVerificationDialog({
             </DialogTrigger>
             <DialogContent className="sm:max-w-6xl w-full max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Data Verification Inspector</DialogTitle>
+                    <DialogTitle className="text-base sm:text-lg">Data Verification</DialogTitle>
                 </DialogHeader>
 
                 <Tabs defaultValue="performance" className="w-full">
-                    <TabsList>
-                        <TabsTrigger value="performance">Performance & NAV</TabsTrigger>
-                        <TabsTrigger value="deposits">Detected Deposits ({deposits.length})</TabsTrigger>
+                    <TabsList className="w-full">
+                        <TabsTrigger value="performance" className="text-xs sm:text-sm flex-1">Performance & NAV</TabsTrigger>
+                        <TabsTrigger value="deposits" className="text-xs sm:text-sm flex-1">Deposits ({deposits.length})</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="performance">
@@ -92,15 +92,15 @@ export function DataVerificationDialog({
                                 Copy CSV
                             </Button>
                         </div>
-                        <div className="rounded-md border">
-                            <Table>
+                        <div className="rounded-md border overflow-hidden">
+                            <Table className="text-[10px] xs:text-xs sm:text-sm w-full table-fixed">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead className="text-right">Portfolio Value ({targetCurrency})</TableHead>
-                                        <TableHead className="text-right">Benchmark (SPY) ({targetCurrency})</TableHead>
-                                        <TableHead className="text-right">Net Deposits ({targetCurrency})</TableHead>
-                                        <TableHead className="text-right">Difference</TableHead>
+                                        <TableHead className="w-[75px] xs:w-[85px]">Date</TableHead>
+                                        <TableHead className="text-right">Portfolio</TableHead>
+                                        <TableHead className="text-right hidden xs:table-cell">Benchmark</TableHead>
+                                        <TableHead className="text-right">Deposits</TableHead>
+                                        <TableHead className="text-right hidden sm:table-cell">Diff</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -108,16 +108,16 @@ export function DataVerificationDialog({
                                         <TableRow key={row.date}>
                                             <TableCell>{row.date}</TableCell>
                                             <TableCell className="text-right">
-                                                {currencySymbol}{row.portfolioValue?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                {currencySymbol}{row.portfolioValue?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                            </TableCell>
+                                            <TableCell className="text-right hidden xs:table-cell">
+                                                {currencySymbol}{row.benchmarkValue?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {currencySymbol}{row.benchmarkValue?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                {currencySymbol}{row.totalInvested?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
-                                            <TableCell className="text-right">
-                                                {currencySymbol}{row.totalInvested?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </TableCell>
-                                            <TableCell className="text-right text-muted-foreground text-xs">
-                                                {currencySymbol}{((row.portfolioValue || 0) - row.benchmarkValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            <TableCell className="text-right text-muted-foreground hidden sm:table-cell">
+                                                {currencySymbol}{((row.portfolioValue || 0) - row.benchmarkValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -136,15 +136,15 @@ export function DataVerificationDialog({
                         <p className="text-sm text-muted-foreground mb-4">
                             These are the transactions interpreted as "Capital Deposits". If you see internal transfers here, that's why your Net Deposits are too high.
                         </p>
-                        <div className="rounded-md border">
-                            <Table>
+                        <div className="rounded-md border overflow-hidden">
+                            <Table className="text-[10px] xs:text-xs sm:text-sm w-full table-fixed">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>{targetCurrency} Amount</TableHead>
+                                        <TableHead className="w-[75px] xs:w-[85px]">Date</TableHead>
+                                        <TableHead>Amount</TableHead>
                                         <TableHead>Original</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Description</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Type</TableHead>
+                                        <TableHead className="hidden md:table-cell">Description</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -152,15 +152,15 @@ export function DataVerificationDialog({
                                         <TableRow key={i}>
                                             <TableCell>{d.date}</TableCell>
                                             <TableCell className="font-medium text-green-600">
-                                                {currencySymbol}{d.amount?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                {currencySymbol}{d.amount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
                                                 {d.originalAmount && d.currency && d.currency !== targetCurrency ? (
-                                                    `${d.originalAmount.toLocaleString()} ${d.currency}`
+                                                    `${d.originalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${d.currency}`
                                                 ) : '-'}
                                             </TableCell>
-                                            <TableCell className="text-xs text-muted-foreground">{d.type}</TableCell>
-                                            <TableCell className="text-xs truncate max-w-[300px]" title={d.description}>{d.description}</TableCell>
+                                            <TableCell className="text-muted-foreground hidden sm:table-cell truncate">{d.type}</TableCell>
+                                            <TableCell className="truncate hidden md:table-cell" title={d.description}>{d.description}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

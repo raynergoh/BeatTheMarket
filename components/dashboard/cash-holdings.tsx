@@ -56,10 +56,10 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
     }
 
     return (
-        <Card className="col-span-full xl:col-span-2">
-            <CardHeader className="flex flex-row items-center font-semibold pt-6">
+        <Card className="col-span-full xl:col-span-2 min-w-0 overflow-hidden">
+            <CardHeader className="flex flex-row items-center font-semibold px-3 sm:px-6">
                 <div className="flex items-center gap-2">
-                    <span className="text-lg">Cash Holdings</span>
+                    <span className="text-base sm:text-lg">Cash Holdings</span>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger>
@@ -72,13 +72,13 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                     </TooltipProvider>
                 </div>
             </CardHeader>
-            <CardContent>
-                <Table>
+            <CardContent className="px-2 sm:px-6">
+                <Table className="text-xs sm:text-sm">
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">Currency</TableHead>
+                            <TableHead className="w-[60px] sm:w-[100px]">Currency</TableHead>
                             <TableHead className="text-right hidden sm:table-cell">Amount</TableHead>
-                            <TableHead className="text-right">Value ({targetCurrency})</TableHead>
+                            <TableHead className="text-right">Value</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

@@ -35,18 +35,18 @@ export function CategoriesCard({ data }: CategoriesCardProps) {
     );
 
     return (
-        <Card className="flex flex-col h-full bg-card">
-            <CardHeader className="items-center pb-0">
-                <CardTitle>Portfolio Allocation</CardTitle>
+        <Card className="flex flex-col h-full bg-card min-w-0 overflow-hidden">
+            <CardHeader className="items-center pb-0 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">Portfolio Allocation</CardTitle>
                 <CardDescription>Breakdown by {activeTab}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className="flex-1 pb-0 px-2 sm:px-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-4 mb-4">
-                        <TabsTrigger value="asset">Asset</TabsTrigger>
-                        <TabsTrigger value="sector">Sector</TabsTrigger>
-                        <TabsTrigger value="geo">Geo</TabsTrigger>
-                        <TabsTrigger value="ticker">Ticker</TabsTrigger>
+                        <TabsTrigger value="asset" className="text-xs sm:text-sm px-1 sm:px-3">Asset</TabsTrigger>
+                        <TabsTrigger value="sector" className="text-xs sm:text-sm px-1 sm:px-3">Sector</TabsTrigger>
+                        <TabsTrigger value="geo" className="text-xs sm:text-sm px-1 sm:px-3">Geo</TabsTrigger>
+                        <TabsTrigger value="ticker" className="text-xs sm:text-sm px-1 sm:px-3">Ticker</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="asset">

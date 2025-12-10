@@ -44,38 +44,38 @@ export function SummaryCards({
     const annualizedAlpha = annualizedMwr - annualizedBenchmarkMwr;
 
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
-                    <div className="flex items-center space-x-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-1 sm:gap-4 lg:grid-cols-4 w-full min-w-0 overflow-x-hidden">
+            <Card className="py-2 sm:py-6 gap-1 sm:gap-6 min-w-0 overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-2 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Portfolio Value</CardTitle>
+                    <div className="flex items-center space-x-2 shrink-0">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{currencySymbol}{netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <p className="text-xs text-muted-foreground">
-                        Total Deposited: {currencySymbol}{totalDeposited.toLocaleString()}
+                <CardContent className="px-2 sm:px-6">
+                    <div className="text-sm sm:text-2xl font-bold truncate">{currencySymbol}{netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                        Deposited: {currencySymbol}{totalDeposited.toLocaleString()}
                     </p>
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">P/L</CardTitle>
+            <Card className="py-2 sm:py-6 gap-1 sm:gap-6 min-w-0 overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-2 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">P/L</CardTitle>
                     {pl >= 0 ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 shrink-0" />
                     ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
+                        <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-500 shrink-0" />
                     )}
                 </CardHeader>
-                <CardContent>
-                    <div className={`text-xl sm:text-2xl font-bold ${pl >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <CardContent className="px-2 sm:px-6">
+                    <div className={`text-sm sm:text-2xl font-bold truncate ${pl >= 0 ? "text-green-500" : "text-red-500"}`}>
                         {pl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <p className="text-xs text-muted-foreground flex items-center gap-1 cursor-help w-fit">
+                                <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 cursor-help w-fit max-w-full truncate">
                                     {mwr >= 0 ? "+" : ""}{mwr.toFixed(1)}% (MWR)
                                 </p>
                             </TooltipTrigger>
@@ -87,12 +87,12 @@ export function SummaryCards({
                         </Tooltip>
                     </TooltipProvider>
 
-                    <p className="text-sm font-semibold mt-1 flex items-center gap-1">
-                        Annualised MWR: {annualizedMwr >= 0 ? "+" : ""}{annualizedMwr.toFixed(1)}%
+                    <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
+                        <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> MWR: {annualizedMwr >= 0 ? "+" : ""}{annualizedMwr.toFixed(1)}%</span>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="max-w-[200px] text-xs">
@@ -104,19 +104,19 @@ export function SummaryCards({
                     </p>
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Alpha</CardTitle>
-                    <Percent className="h-4 w-4 text-muted-foreground" />
+            <Card className="py-2 sm:py-6 gap-1 sm:gap-6 min-w-0 overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-2 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Alpha</CardTitle>
+                    <Percent className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
                 </CardHeader>
-                <CardContent>
-                    <div className={`text-xl sm:text-2xl font-bold ${alpha >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <CardContent className="px-2 sm:px-6">
+                    <div className={`text-sm sm:text-2xl font-bold truncate ${alpha >= 0 ? "text-green-500" : "text-red-500"}`}>
                         {alpha >= 0 ? "+" : ""}{alpha.toFixed(1)}%
                     </div>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <p className="text-xs text-muted-foreground cursor-help w-fit border-b border-dotted border-muted-foreground/50">
+                                <p className="text-[10px] sm:text-xs text-muted-foreground cursor-help w-fit border-b border-dotted border-muted-foreground/50 max-w-full truncate">
                                     vs Benchmark (Total)
                                 </p>
                             </TooltipTrigger>
@@ -128,12 +128,12 @@ export function SummaryCards({
                         </Tooltip>
                     </TooltipProvider>
 
-                    <p className="text-sm font-semibold mt-1 flex items-center gap-1">
-                        Annualised Alpha: {annualizedAlpha >= 0 ? "+" : ""}{annualizedAlpha.toFixed(1)}%
+                    <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
+                        <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> Alpha: {annualizedAlpha >= 0 ? "+" : ""}{annualizedAlpha.toFixed(1)}%</span>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="max-w-[200px] text-xs">
@@ -145,30 +145,32 @@ export function SummaryCards({
                     </p>
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Benchmark Comparison</CardTitle>
-                    <Select value={selectedBenchmark} onValueChange={onBenchmarkChange}>
-                        <SelectTrigger className="h-7 w-[110px] text-xs">
-                            <SelectValue placeholder="Index" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                            <SelectItem value="sp500">S&P 500</SelectItem>
-                            <SelectItem value="qqq">QQQ</SelectItem>
-                        </SelectContent>
-                    </Select>
+            <Card className="py-2 sm:py-6 gap-1 sm:gap-6 min-w-0 overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-2 sm:px-6 min-w-0">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate min-w-0">Benchmark</CardTitle>
+                    <div className="min-w-0 shrink-0">
+                        <Select value={selectedBenchmark} onValueChange={onBenchmarkChange}>
+                            <SelectTrigger size="xs" className="h-5 md:h-[22px] xl:h-6 w-[80px] sm:w-[110px] lg:w-[95px] xl:w-[110px] text-[10px] sm:text-xs px-1 py-0 min-w-0">
+                                <SelectValue placeholder="Index" />
+                            </SelectTrigger>
+                            <SelectContent position="popper">
+                                <SelectItem value="sp500">S&P 500</SelectItem>
+                                <SelectItem value="qqq">QQQ</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{currencySymbol}{benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <p className="text-xs text-muted-foreground">
+                <CardContent className="px-2 sm:px-6">
+                    <div className="text-sm sm:text-2xl font-bold truncate" title={`${currencySymbol}${benchmarkValue.toLocaleString()}`}>{currencySymbol}{benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         if invested in {selectedBenchmark === 'sp500' ? 'S&P 500' : selectedBenchmark.toUpperCase()}
                     </p>
-                    <p className="text-sm font-semibold mt-1 flex items-center gap-1">
-                        Annualised MWR: {annualizedBenchmarkMwr >= 0 ? "+" : ""}{annualizedBenchmarkMwr.toFixed(1)}%
+                    <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
+                        <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> MWR: {annualizedBenchmarkMwr >= 0 ? "+" : ""}{annualizedBenchmarkMwr.toFixed(1)}%</span>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="max-w-[200px] text-xs">

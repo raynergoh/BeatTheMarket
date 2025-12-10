@@ -65,24 +65,20 @@ export function CategoryPieChart({ title, data }: CategoryPieChartProps) {
                 </PieChart>
             </ChartContainer>
 
-            <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-2 w-full px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 md:gap-x-8 gap-y-1 sm:gap-y-2 w-full px-2 sm:px-4">
                 {displayData.map((item, index) => {
                     const percent = ((item.value / total) * 100).toFixed(1);
                     return (
-                        <div key={item.name} className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2">
-                                <div
-                                    className="h-3 w-3 rounded-full flex-shrink-0"
-                                    style={{ backgroundColor: item.fill }}
-                                />
-                                <span className="font-medium text-foreground">{item.name}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-muted-foreground">
-                                <span>{percent}%</span>
-                                <span className="font-mono w-[70px] text-right">
-                                    ${item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                </span>
-                            </div>
+                        <div key={item.name} className="flex items-center text-xs sm:text-sm gap-1 sm:gap-2 overflow-hidden">
+                            <div
+                                className="h-2 w-2 sm:h-3 sm:w-3 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: item.fill }}
+                            />
+                            <span className="font-medium text-foreground truncate flex-1 min-w-0" title={item.name}>{item.name}</span>
+                            <span className="text-muted-foreground flex-shrink-0">{percent}%</span>
+                            <span className="font-mono text-muted-foreground w-[50px] sm:w-[65px] text-right flex-shrink-0">
+                                ${item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </span>
                         </div>
                     )
                 })}

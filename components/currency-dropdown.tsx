@@ -14,7 +14,7 @@ export function CurrencyDropdown() {
 
     return (
         <Select value={targetCurrency} onValueChange={(v: any) => setTargetCurrency(v)}>
-            <SelectTrigger className="h-8 w-[110px]">
+            <SelectTrigger className="h-8 w-auto min-w-[3.5rem] gap-1 px-2 text-xs sm:text-sm">
                 <SelectValue placeholder="Currency" />
             </SelectTrigger>
             <SelectContent>

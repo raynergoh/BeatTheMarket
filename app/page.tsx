@@ -199,28 +199,30 @@ function DashboardContent() {
 
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <div className="flex min-h-screen w-full flex-col bg-muted/40 overflow-x-hidden">
+      <div className="flex flex-col sm:gap-4 sm:py-4 w-full min-w-0">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 sm:gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <div className="flex items-center gap-2">
             <Image
               src="/images/app/logo-full-custom.png"
               alt="BeatTheMarket"
               width={855}
               height={125}
-              className="h-8 w-auto md:h-10 dark:filter-none filter brightness-[0.4] saturate-[1.5]"
+              className="h-6 w-auto max-w-[120px] sm:max-w-none sm:h-8 md:h-10 dark:filter-none filter brightness-[0.4] saturate-[1.5] shrink-0 object-contain"
               priority
             />
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <CurrencyDropdown />
-            <ModeToggle />
-            <GuideModal />
+            <div className="hidden xs:flex items-center gap-1 sm:gap-2">
+              <ModeToggle />
+              <GuideModal />
+            </div>
             <SettingsDialog onSettingsChanged={fetchData} />
 
           </div>
         </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="flex flex-col flex-1 items-start gap-4 p-2 sm:px-6 sm:py-0 md:gap-8 w-full min-w-0">
           {error && <div className="p-4 rounded-md bg-red-100 text-red-700">{error} - Please check settings.</div>}
 
           {warnings.length > 0 && (
@@ -235,11 +237,11 @@ function DashboardContent() {
           )}
 
           {loading ? (
-            <div className="flex h-64 items-center justify-center">
+            <div className="flex h-64 items-center justify-center w-full">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
-            <div className="flex flex-col gap-4 md:gap-8">
+            <div className="flex flex-col gap-4 md:gap-8 w-full min-w-0">
               {/* Row 1: Summary Cards (Full Width) */}
               <SummaryCards
                 netWorth={summary.netWorth}
@@ -264,7 +266,7 @@ function DashboardContent() {
               />
 
               {/* Row 3: Split View - 50/50 */}
-              <div className="grid flex-col lg:grid-cols-2 gap-4 md:gap-8">
+              <div className="grid flex-col xl:grid-cols-2 gap-4 md:gap-8 w-full min-w-0">
                 {/* Left Column: Holdings & Cash (50%) */}
                 <div className="flex flex-col gap-4 w-full">
                   <CashHoldings holdings={holdings} totalNetWorth={summary.netWorth} />

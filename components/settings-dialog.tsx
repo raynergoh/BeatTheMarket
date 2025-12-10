@@ -185,9 +185,9 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="h-8 px-2 gap-2">
                     <RefreshCw className="h-4 w-4" />
-                    <span>Sync Data</span>
+                    <span className="hidden sm:inline">Sync Data</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
@@ -215,61 +215,60 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                 </DialogHeader>
 
                 {view === 'selection' && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 py-1">
                         <Button
                             variant="outline"
-                            className="h-60 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors"
+                            className="h-32 sm:h-60 flex flex-col items-center justify-center gap-2 sm:gap-4 hover:border-primary/50 transition-colors"
                             onClick={() => setView('ibkr')}
                         >
-                            <div className="relative w-32 h-32 rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
+                            <div className="relative w-16 h-16 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
                                 <Image src="/images/brokers/ibkr-icon.png" alt="IBKR" fill className="object-cover" />
-// ... (I will use multi_replace for efficiency since they are scattered)
                             </div>
-                            <span className="font-semibold text-xl">IBKR</span>
+                            <span className="font-semibold text-sm sm:text-xl">IBKR</span>
                         </Button>
 
                         <Button
                             variant="outline"
-                            className="h-60 flex flex-col items-center justify-center gap-4 opacity-80"
+                            className="h-32 sm:h-60 flex flex-col items-center justify-center gap-2 sm:gap-4 opacity-80"
                             onClick={() => setView('moomoo')}
                         >
-                            <div className="relative w-32 h-32 rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
+                            <div className="relative w-16 h-16 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
                                 <Image src="/images/brokers/moomoo-icon.png" alt="Moomoo" fill className="object-cover" />
                             </div>
-                            <span className="font-semibold text-xl">Moomoo</span>
+                            <span className="font-semibold text-sm sm:text-xl">Moomoo</span>
                         </Button>
 
                         <Button
                             variant="outline"
-                            className="h-60 flex flex-col items-center justify-center gap-4 opacity-80"
+                            className="h-32 sm:h-60 flex flex-col items-center justify-center gap-2 sm:gap-4 opacity-80"
                             onClick={() => setView('tiger')}
                         >
-                            <div className="relative w-32 h-32 rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
+                            <div className="relative w-16 h-16 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
                                 <Image src="/images/brokers/tiger-icon.png" alt="Tiger" fill className="object-cover" />
                             </div>
-                            <span className="font-semibold text-xl">Tiger</span>
+                            <span className="font-semibold text-sm sm:text-xl">Tiger</span>
                         </Button>
 
                         <Button
                             variant="outline"
-                            className="h-60 flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-muted/50 transition-all text-center"
+                            className="h-32 sm:h-60 flex flex-col items-center justify-center gap-2 sm:gap-6 hover:border-primary hover:bg-muted/50 transition-all text-center"
                             onClick={() => setView('syfe')}
                         >
-                            <div className="relative w-32 h-32 rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
+                            <div className="relative w-16 h-16 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
                                 <Image src="/images/brokers/syfe-icon.png" alt="Syfe" fill className="object-cover" />
                             </div>
-                            <span className="font-semibold text-xl">Syfe</span>
+                            <span className="font-semibold text-sm sm:text-xl">Syfe</span>
                         </Button>
 
                         <Button
                             variant="outline"
-                            className="h-60 flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-muted/50 transition-all text-center"
+                            className="h-32 sm:h-60 flex flex-col items-center justify-center gap-2 sm:gap-6 hover:border-primary hover:bg-muted/50 transition-all text-center"
                             onClick={() => setView('webull')}
                         >
-                            <div className="relative w-32 h-32 rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
+                            <div className="relative w-16 h-16 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border bg-background shrink-0 shadow-sm">
                                 <Image src="/images/brokers/webull-icon.png" alt="Webull" fill className="object-cover" />
                             </div>
-                            <span className="font-semibold text-xl">Webull</span>
+                            <span className="font-semibold text-sm sm:text-xl">Webull</span>
                         </Button>
                     </div>
                 )}
@@ -322,8 +321,8 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                 {view === 'ibkr' && (
                     <Tabs defaultValue="api" className="w-full animated-fade-in">
                         <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="api">Auto-Sync (Recommended)</TabsTrigger>
-                            <TabsTrigger value="history">Manual Upload</TabsTrigger>
+                            <TabsTrigger value="api" className="text-xs sm:text-sm px-1 sm:px-3">Auto-Sync</TabsTrigger>
+                            <TabsTrigger value="history" className="text-xs sm:text-sm px-1 sm:px-3">Manual Upload</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="api" className="space-y-4 pt-4">
