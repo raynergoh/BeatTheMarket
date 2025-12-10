@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Settings, Loader2, CheckCircle2, XCircle, HelpCircle, ChevronLeft, RefreshCw, AlertTriangle, ExternalLink, Trash2, FileText } from "lucide-react"
+import { Settings, Loader2, CheckCircle2, XCircle, ChevronLeft, ExternalLink, FileText, HelpCircle, RefreshCw, Trash2, Lightbulb, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -438,7 +438,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                 <ul className="list-disc pl-4 space-y-1 text-xs">
                                                     <li><strong>Cash Report</strong></li>
                                                     <li><strong>Cash Transactions</strong></li>
-                                                    <li><strong>Net Asset Value (NAV) in Base</strong> (search under Equity Summary)</li>
+                                                    <li><strong>Net Asset Value (NAV) in Base</strong></li>
                                                     <li><strong>Open Positions</strong></li>
                                                 </ul>
                                                 <div className="bg-background rounded overflow-hidden mt-2">
@@ -458,7 +458,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
 
                                             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                                                 <p className="font-medium text-foreground">Step 5: Retrieve Query ID</p>
-                                                <p>Back on the main <strong>Flex Queries</strong> page, expand your new query (click <strong>i</strong> or <strong>Edit</strong>) to reveal the <strong>Query ID</strong>.</p>
+                                                <p>Back on the main <strong>Flex Queries</strong> page, expand your new query (click <strong>Edit</strong>) to reveal the <strong>Query ID</strong>.</p>
                                                 <div className="grid grid-cols-1 gap-2 mt-2">
                                                     <div className="bg-background rounded overflow-hidden">
                                                         <Image src="/images/guides/ibkr/ibkr-step-5-find-id-1-list-light.png" alt="Find Query in List" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
@@ -523,6 +523,10 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                 <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                                                     <p className="font-medium text-foreground">Step 2: Run the Query Manually</p>
                                                     <p>Find your saved query in the list and click the <strong>Run</strong> button (arrow icon).</p>
+                                                    <div className="flex gap-2 items-start text-xs bg-muted text-muted-foreground p-3 rounded mt-2">
+                                                        <Lightbulb className="w-4 h-4 shrink-0 text-yellow-500" />
+                                                        <p><strong>Tip:</strong> We recommend creating separate Flex Queries matching calendar years (e.g., "2023", "2024") to keep your history organized.</p>
+                                                    </div>
                                                     <div className="bg-background rounded overflow-hidden mt-2">
                                                         <Image src="/images/guides/ibkr/ibkr-manual-step-2-run-light.png" alt="Run Query" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
                                                         <Image src="/images/guides/ibkr/ibkr-manual-step-2-run-dark.png" alt="Run Query" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
@@ -540,7 +544,10 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
 
                                                 <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                                                     <p className="font-medium text-foreground">Step 4: Download & Upload</p>
-                                                    <p>Click <strong>Run</strong> to generate the report. Download the XML file and upload it below. Repeat for other years if needed.</p>
+                                                    <p>Click <strong>Run</strong> to generate the report. Download the XML file and upload it below.</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        Recommended: Rename the file (e.g., <code>2023.xml</code>) before uploading to easily identify the year.
+                                                    </p>
                                                     <div className="flex gap-2 items-start text-xs bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 p-3 rounded border border-zinc-500/20">
                                                         <AlertTriangle className="w-4 h-4 shrink-0" />
                                                         <div className="space-y-1">
