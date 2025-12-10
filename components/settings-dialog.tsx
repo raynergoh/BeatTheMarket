@@ -541,18 +541,26 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                                                <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                                                     <p className="font-medium text-foreground">Step 4: Download & Upload</p>
                                                     <p>Click <strong>Run</strong> to generate the report. Download the XML file and upload it below.</p>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        Recommended: Rename the file (e.g., <code>2023.xml</code>) before uploading to easily identify the year.
-                                                    </p>
+
+                                                    {/* Recommended - Blue */}
+                                                    <div className="flex gap-2 items-start text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 p-3 rounded border border-blue-500/20">
+                                                        <Lightbulb className="w-4 h-4 shrink-0" />
+                                                        <p><strong>Recommended:</strong> Rename the file (e.g., <code className="bg-blue-500/20 px-1 rounded">2023.xml</code>) before uploading to easily identify the year.</p>
+                                                    </div>
+
+                                                    {/* Note - Grey */}
                                                     <div className="flex gap-2 items-start text-xs bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 p-3 rounded border border-zinc-500/20">
+                                                        <HelpCircle className="w-4 h-4 shrink-0" />
+                                                        <p><strong>Note:</strong> Ensure there are <strong>no gaps</strong> in your date ranges. It is okay if files have <strong>overlapping dates</strong>; the system will handle duplicates automatically.</p>
+                                                    </div>
+
+                                                    {/* Tip - Yellow */}
+                                                    <div className="flex gap-2 items-start text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 p-3 rounded border border-yellow-500/20">
                                                         <AlertTriangle className="w-4 h-4 shrink-0" />
-                                                        <div className="space-y-1">
-                                                            <p><strong>Note:</strong> Ensure there are <strong>no gaps</strong> in your date ranges. It is okay if files have <strong>overlapping dates</strong>; the system will handle duplicates automatically.</p>
-                                                            <p>Since IBKR only logs activity on weekdays, it is normal if your files don't start exactly on Jan 1 or end on Dec 31 if those dates fall on a weekend.</p>
-                                                        </div>
+                                                        <p><strong>Tip:</strong> Since IBKR only logs activity on weekdays, it is normal if your files don't start exactly on Jan 1 or end on Dec 31 if those dates fall on a weekend.</p>
                                                     </div>
                                                 </div>
                                             </div>
