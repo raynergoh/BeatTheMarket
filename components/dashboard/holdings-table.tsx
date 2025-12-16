@@ -9,8 +9,13 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, Info } from "lucide-react";
 import * as React from "react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { OpenPosition } from '@/lib/ibkr-parser';
 
@@ -70,7 +75,19 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
     return (
         <Card className="min-w-0 overflow-hidden">
             <CardHeader className="px-3 sm:px-6">
-                <CardTitle className="text-base sm:text-lg">Current Holdings</CardTitle>
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    Current Holdings
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="cursor-pointer focus:outline-none" aria-label="More info">
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="max-w-[300px] p-3 text-sm">
+                            <p>Detailed view of all your current open positions and their performance.</p>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </CardTitle>
             </CardHeader>
             <CardContent className="px-2 sm:px-6">
                 <Table className="text-xs sm:text-sm">
@@ -103,7 +120,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                             const safeMarkPrice = stock.markPrice || 0;
                             const safeAvgCost = stock.costBasisPrice || 0;
 
-                            const plPercent = safeCostBasis > 0 ? ((safeValue - safeCostBasis) / safeCostBasis) * 100 : 0;
+                            const plPercent = safeCostBasis !== 0 ? ((safeValue - safeCostBasis) / Math.abs(safeCostBasis)) * 100 : 0;
                             const allocation = totalValue > 0 ? (safeValue / totalValue) * 100 : 0;
 
                             // Determine currency for formatting

@@ -14,9 +14,10 @@ import { CategoryData, useCategoryChartData } from "@/hooks/use-category-chart-d
 interface CategoryPieChartProps {
     title: string
     data: CategoryData[]
+    currencySymbol?: string
 }
 
-export function CategoryPieChart({ title, data }: CategoryPieChartProps) {
+export function CategoryPieChart({ title, data, currencySymbol = "$" }: CategoryPieChartProps) {
     const { displayData, config, total } = useCategoryChartData(data)
 
     return (
@@ -47,7 +48,7 @@ export function CategoryPieChart({ title, data }: CategoryPieChartProps) {
                                                 y={viewBox.cy}
                                                 className="fill-foreground text-3xl font-bold"
                                             >
-                                                ${(total / 1000).toFixed(0)}k
+                                                {currencySymbol}{total >= 1000000 ? (total / 1000000).toFixed(2) + "M" : (total / 1000).toFixed(0) + "k"}
                                             </tspan>
                                             <tspan
                                                 x={viewBox.cx}
@@ -76,13 +77,13 @@ export function CategoryPieChart({ title, data }: CategoryPieChartProps) {
                             />
                             <span className="font-medium text-foreground truncate flex-1 min-w-0" title={item.name}>{item.name}</span>
                             <span className="text-muted-foreground flex-shrink-0">{percent}%</span>
-                            <span className="font-mono text-muted-foreground w-[50px] sm:w-[65px] text-right flex-shrink-0">
-                                ${item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            <span className="font-mono text-muted-foreground w-[60px] sm:w-[90px] text-right flex-shrink-0">
+                                {currencySymbol}{item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                             </span>
                         </div>
                     )
                 })}
             </div>
-        </div>
+        </div >
     )
 }

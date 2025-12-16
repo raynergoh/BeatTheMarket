@@ -8,11 +8,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SummaryCardsProps {
     netWorth: number;
@@ -72,35 +71,35 @@ export function SummaryCards({
                     <div className={`text-sm sm:text-2xl font-bold truncate ${pl >= 0 ? "text-green-500" : "text-red-500"}`}>
                         {pl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 cursor-help w-fit max-w-full truncate">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="cursor-help focus:outline-none text-left" aria-label="More info">
+                                <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 w-fit border-b border-dotted border-muted-foreground/50 max-w-full truncate">
                                     {mwr >= 0 ? "+" : ""}{mwr.toFixed(1)}% (MWR)
                                 </p>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p className="max-w-[200px] text-xs">
-                                    Money-Weighted Return (MWR) accounts for the timing and size of cash flows, reflecting personal performance.
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="max-w-[200px] text-xs p-3">
+                            <p>
+                                Money-Weighted Return (MWR) accounts for the timing and size of cash flows, reflecting personal performance.
+                            </p>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
                         <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> MWR: {annualizedMwr >= 0 ? "+" : ""}{annualizedMwr.toFixed(1)}%</span>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p className="max-w-[200px] text-xs">
-                                        The compounded annual growth rate (CAGR) based on your Money-Weighted Return.
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="cursor-pointer focus:outline-none" aria-label="More info">
+                                    <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="max-w-[200px] text-xs p-3">
+                                <p>
+                                    The compounded annual growth rate (CAGR) based on your Money-Weighted Return.
+                                </p>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </p>
                 </CardContent>
             </Card>
@@ -113,35 +112,35 @@ export function SummaryCards({
                     <div className={`text-sm sm:text-2xl font-bold truncate ${alpha >= 0 ? "text-green-500" : "text-red-500"}`}>
                         {alpha >= 0 ? "+" : ""}{alpha.toFixed(1)}%
                     </div>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <p className="text-[10px] sm:text-xs text-muted-foreground cursor-help w-fit border-b border-dotted border-muted-foreground/50 max-w-full truncate">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="cursor-help focus:outline-none text-left" aria-label="More info">
+                                <p className="text-[10px] sm:text-xs text-muted-foreground w-fit border-b border-dotted border-muted-foreground/50 max-w-full truncate">
                                     vs Benchmark (Total)
                                 </p>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p className="max-w-[200px] text-xs">
-                                    The difference between your Total MWR and the Benchmark Total MWR.
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="max-w-[200px] text-xs p-3">
+                            <p>
+                                The difference between your Total MWR and the Benchmark Total MWR.
+                            </p>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
                         <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> Alpha: {annualizedAlpha >= 0 ? "+" : ""}{annualizedAlpha.toFixed(1)}%</span>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p className="max-w-[200px] text-xs">
-                                        The difference between your Annualised MWR and the Benchmark Annualised MWR.
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="cursor-pointer focus:outline-none" aria-label="More info">
+                                    <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="max-w-[200px] text-xs p-3">
+                                <p>
+                                    The difference between your Annualised MWR and the Benchmark Annualised MWR.
+                                </p>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </p>
                 </CardContent>
             </Card>
@@ -167,18 +166,18 @@ export function SummaryCards({
                     </p>
                     <p className="text-[10px] sm:text-sm font-semibold mt-1 flex items-center gap-1 max-w-full truncate">
                         <span className="truncate"><span className="hidden xs:inline sm:hidden lg:inline xl:hidden">Ann.</span><span className="xs:hidden sm:inline lg:hidden xl:inline">Annualised</span> MWR: {annualizedBenchmarkMwr >= 0 ? "+" : ""}{annualizedBenchmarkMwr.toFixed(1)}%</span>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground shrink-0" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p className="max-w-[200px] text-xs">
-                                        The compounded annual growth rate (CAGR) of the benchmark, assuming the same deposit timing as your portfolio.
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="cursor-pointer focus:outline-none" aria-label="More info">
+                                    <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="max-w-[200px] text-xs p-3">
+                                <p>
+                                    The compounded annual growth rate (CAGR) of the benchmark, assuming the same deposit timing as your portfolio.
+                                </p>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </p>
                 </CardContent>
             </Card>

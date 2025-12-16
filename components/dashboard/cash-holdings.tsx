@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import { OpenPosition } from "@/lib/ibkr-parser";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CashHoldingsProps {
     holdings: OpenPosition[];
@@ -60,16 +64,16 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
             <CardHeader className="flex flex-row items-center font-semibold px-3 sm:px-6">
                 <div className="flex items-center gap-2">
                     <span className="text-base sm:text-lg">Cash Holdings</span>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="cursor-pointer focus:outline-none" aria-label="More info">
                                 <Info className="h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Cash balances in different currencies converted to {targetCurrency}.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="max-w-[300px] p-3 text-sm">
+                            <p>Cash balances in different currencies converted to {targetCurrency}.</p>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </CardHeader>
             <CardContent className="px-2 sm:px-6">

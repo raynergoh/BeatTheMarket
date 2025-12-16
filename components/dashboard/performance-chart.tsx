@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ChevronDown, DollarSign, TrendingDown, TrendingUp, Percent, HelpCircle } from "lucide-react"
+import { ChevronDown, DollarSign, TrendingDown, TrendingUp, Percent, HelpCircle, Info } from "lucide-react"
 import { PortfolioData } from "@/lib/ibkr-parser"
 import { DataVerificationDialog } from "./data-verification-dialog"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -122,7 +122,19 @@ export function PerformanceChart({
                 <div className="flex flex-row items-start justify-between lg:items-center">
                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                         <div className="flex flex-col gap-1">
-                            <CardTitle>Performance History</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                Performance History
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="cursor-pointer focus:outline-none" aria-label="More info">
+                                            <Info className="h-4 w-4 text-muted-foreground" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="max-w-[300px] p-3 text-sm">
+                                        <p>Visual comparison of your portfolio performance against the selected benchmark over time.</p>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </CardTitle>
                             <CardDescription>
                                 Comparing portfolio cost basis against {selectedBenchmark === 'sp500' ? 'S&P 500' : selectedBenchmark.toUpperCase()}
                             </CardDescription>

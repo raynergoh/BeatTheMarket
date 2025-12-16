@@ -134,7 +134,7 @@ export function DataVerificationDialog({
                             </Button>
                         </div>
                         <p className="text-sm text-muted-foreground mb-4">
-                            These are the transactions interpreted as "Capital Deposits". If you see internal transfers here, that's why your Net Deposits are too high.
+                            These are the transactions interpreted as "Capital Deposits/Withdrawals". Internal transfers between tracked accounts will appear as offsetting entries.
                         </p>
                         <div className="rounded-md border overflow-hidden">
                             <Table className="text-[10px] xs:text-xs sm:text-sm w-full table-fixed">
@@ -151,7 +151,7 @@ export function DataVerificationDialog({
                                     {deposits.map((d, i) => (
                                         <TableRow key={i}>
                                             <TableCell>{d.date}</TableCell>
-                                            <TableCell className="font-medium text-green-600">
+                                            <TableCell className={`font-medium ${d.amount < 0 ? "text-red-500" : "text-green-600"}`}>
                                                 {currencySymbol}{d.amount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">

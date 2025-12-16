@@ -109,7 +109,7 @@ function DashboardContent() {
       setSummary(responseData.summary || { netWorth: 0, totalDeposited: 0 });
       setHoldings(responseData.holdings || []);
       setCategories(responseData.categories); // New field
-      setDebugDeposits(responseData.debugDeposits || []);
+      setDebugDeposits(responseData.deposits || []);
       setWarnings(responseData.warnings || []);
 
       if (responseData.baseCurrency) {
@@ -275,7 +275,7 @@ function DashboardContent() {
 
                 {/* Right Column: Categories (50%) */}
                 <div>
-                  <CategoriesCard data={categories} />
+                  <CategoriesCard data={categories} currencySymbol={currencySymbol} />
                 </div>
               </div>
             </div>

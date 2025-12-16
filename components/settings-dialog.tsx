@@ -124,6 +124,8 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                     equitySummary: parsed.equitySummary,
                     openPositions: parsed.openPositions,
                     cashReports: parsed.cashReports,
+                    transfers: parsed.transfers,
+                    baseCurrency: parsed.baseCurrency,
                     fromDate: parsed.fromDate,
                     toDate: parsed.toDate
                 })
@@ -135,15 +137,8 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
         }
 
         if (allParsedData.length > 0) {
-            const existing = localStorage.getItem("ibkr_manual_history")
-            let combined = allParsedData
-            if (existing) {
-                try {
-                    const prev = JSON.parse(existing)
-                    combined = [...prev, ...allParsedData]
-                } catch (e) { }
-            }
-
+            // Append new files to the current state (which reflects any deletions made in this session)
+            const combined = [...manualFiles, ...allParsedData];
             setManualFiles(combined)
 
             const totalTrans = combined.reduce((acc, f) => acc + (f.cashTransactions?.length || 0), 0);
@@ -434,15 +429,31 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                                                 <p className="font-medium text-foreground">Step 3: Select Sections</p>
                                                 <p>Enable the following sections and check <strong>Select All</strong> for each:</p>
-                                                <ul className="list-disc pl-4 space-y-1 text-xs">
+                                                <ul className="list-disc pl-4 space-y-1 text-xs grid grid-cols-2 gap-x-4">
                                                     <li><strong>Cash Report</strong></li>
                                                     <li><strong>Cash Transactions</strong></li>
-                                                    <li><strong>Net Asset Value (NAV) in Base</strong></li>
+                                                    <li><strong>NAV in Base</strong></li>
                                                     <li><strong>Open Positions</strong></li>
+                                                    <li><strong>Transfers</strong></li>
+                                                    <li><strong>Financial Instrument Information</strong></li>
                                                 </ul>
-                                                <div className="bg-background rounded overflow-hidden mt-2">
-                                                    <Image src="/images/guides/ibkr/ibkr-step-3-sections-light.png" alt="Select Sections" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
-                                                    <Image src="/images/guides/ibkr/ibkr-step-3-sections-dark.png" alt="Select Sections" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                <div className="grid grid-cols-2 gap-2 mt-2">
+                                                    <div className="bg-background rounded overflow-hidden border">
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-1-light.png" alt="Sections Part 1" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-1-dark.png" alt="Sections Part 1" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                    </div>
+                                                    <div className="bg-background rounded overflow-hidden border">
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-2-light.png" alt="Sections Part 2" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-2-dark.png" alt="Sections Part 2" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                    </div>
+                                                    <div className="bg-background rounded overflow-hidden border">
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-3-light.png" alt="Sections Part 3" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-3-dark.png" alt="Sections Part 3" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                    </div>
+                                                    <div className="bg-background rounded overflow-hidden border">
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-4-light.png" alt="Sections Part 4" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
+                                                        <Image src="/images/guides/ibkr/ibkr-step-3-sections-4-dark.png" alt="Sections Part 4" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                    </div>
                                                 </div>
                                             </div>
 
