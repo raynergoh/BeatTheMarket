@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { IbkrProvider } from '../src/core/parser/ibkr-provider.ts';
+import { IbkrProvider } from '../src/core/parser/ibkr-provider';
 
 // Mock XML content for testing purposes
 const mockXml = `

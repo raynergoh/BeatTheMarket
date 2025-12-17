@@ -241,8 +241,6 @@ export async function POST(request: Request) {
                 : new Date(sortedFlows[0].date); // Fallback to cash flow if no equity history
             const endDate = new Date();
 
-            logToFile(`[BENCHMARK DEBUG] SPY Start Date: ${startDate.toISOString().split('T')[0]} (source: ${sortedEquity.length > 0 ? 'equityHistory' : 'cashFlows'})`);
-
             const spyData = await getHistoricalPrices(benchmarkSymbol, startDate, endDate);
 
             // Normalize SPY to Target
@@ -392,17 +390,10 @@ export async function POST(request: Request) {
             }
 
             // Benchmark uses pure deposits (no synthetic collateral adjustment)
-            const depositsSum = deposits.reduce((sum, d) => sum + d.amount, 0);
-            logToFile(`[BENCHMARK DEBUG] Deposits Sum: ${depositsSum.toFixed(2)} ${targetCurrency}`);
-            logToFile(`[BENCHMARK DEBUG] First Deposit Date: ${deposits.length > 0 ? deposits[0].date : 'N/A'}`);
-            logToFile(`[BENCHMARK DEBUG] First SPY Price: ${spyInTarget.length > 0 ? spyInTarget[0].close.toFixed(2) : 'N/A'} (Date: ${spyInTarget.length > 0 ? spyInTarget[0].date : 'N/A'})`);
-            logToFile(`[BENCHMARK DEBUG] Last SPY Price: ${spyInTarget.length > 0 ? spyInTarget[spyInTarget.length - 1].close.toFixed(2) : 'N/A'} (Date: ${spyInTarget.length > 0 ? spyInTarget[spyInTarget.length - 1].date : 'N/A'})`);
-
             comparison = calculateComparison(deposits, spyInTarget);
 
             if (comparison.length > 0) {
                 benchmarkValue = comparison[comparison.length - 1].benchmarkValue;
-                logToFile(`[BENCHMARK DEBUG] Final Benchmark Value: ${benchmarkValue.toFixed(2)} ${targetCurrency}`);
             }
 
             // 4. Fill Forward Portfolio Value (Verification Data)

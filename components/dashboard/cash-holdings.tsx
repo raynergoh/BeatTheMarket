@@ -24,7 +24,8 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
     // Filter for cash
     const cashPositions = React.useMemo(() => {
         return holdings.filter(p =>
-            p.assetCategory === 'CASH' ||
+            (p as any).assetClass === 'CASH' ||
+            (p as any).assetCategory === 'CASH' || // Fallback for OpenPosition type
             p.symbol === 'CASH' ||
             ['USD', 'SGD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'JPY', 'KRW'].includes(p.symbol)
         );
@@ -41,7 +42,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
 
             map.set(curr, {
                 amount: existing.amount + p.quantity,
-                value: existing.value + p.value // p.value is already converted to Target by backend
+                value: existing.value + ((p as any).marketValue || (p as any).value || 0) // Support both Asset and OpenPosition
             });
         });
 
