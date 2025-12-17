@@ -17,10 +17,10 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { OpenPosition } from '@/lib/ibkr-parser';
+import { Asset, OpenPosition } from '@/src/core/types';
 
 interface HoldingsTableProps {
-    holdings: OpenPosition[];
+    holdings: (OpenPosition | Asset)[]; // Allow both for transition, or stricter Asset[]
     totalValue?: number;
 }
 
@@ -31,24 +31,27 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
         let sortableItems = [...holdings];
         if (sortConfig !== null) {
             sortableItems.sort((a, b) => {
-                let aValue = 0;
-                let bValue = 0;
+                const aVal = (a as any).marketValue ?? (a as any).value ?? 0;
+                const bVal = (b as any).marketValue ?? (b as any).value ?? 0;
+                const aCost = (a as any).costBasis ?? (a as any).costBasisMoney ?? 0;
+                const bCost = (b as any).costBasis ?? (b as any).costBasisMoney ?? 0;
+
+                let aMetric = 0;
+                let bMetric = 0;
 
                 // Extract values based on key
                 if (sortConfig.key === 'pl') {
-                    const aCost = a.costBasisMoney || 0;
-                    const bCost = b.costBasisMoney || 0;
-                    aValue = aCost > 0 ? ((a.value - aCost) / aCost) : 0;
-                    bValue = bCost > 0 ? ((b.value - bCost) / bCost) : 0;
+                    aMetric = aCost > 0 ? ((aVal - aCost) / aCost) : 0;
+                    bMetric = bCost > 0 ? ((bVal - bCost) / bCost) : 0;
                 } else if (sortConfig.key === 'allocation') {
-                    aValue = totalValue > 0 ? (a.value / totalValue) : 0;
-                    bValue = totalValue > 0 ? (b.value / totalValue) : 0;
+                    aMetric = totalValue > 0 ? (aVal / totalValue) : 0;
+                    bMetric = totalValue > 0 ? (bVal / totalValue) : 0;
                 }
 
-                if (aValue < bValue) {
+                if (aMetric < bMetric) {
                     return sortConfig.direction === 'asc' ? -1 : 1;
                 }
-                if (aValue > bValue) {
+                if (aMetric > bMetric) {
                     return sortConfig.direction === 'asc' ? 1 : -1;
                 }
                 return 0;
@@ -115,10 +118,10 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                     <TableBody>
                         {sortedHoldings.map((stock, index) => {
                             // Safety checks for potentially null numeric values
-                            const safeValue = stock.value || 0;
-                            const safeCostBasis = stock.costBasisMoney || 0;
-                            const safeMarkPrice = stock.markPrice || 0;
-                            const safeAvgCost = stock.costBasisPrice || 0;
+                            const safeValue = (stock as any).marketValue ?? (stock as any).value ?? 0;
+                            const safeCostBasis = (stock as any).costBasis ?? (stock as any).costBasisMoney ?? 0;
+                            const safeMarkPrice = (stock as any).markPrice || 0;
+                            const safeAvgCost = (stock as any).costBasisPrice || 0;
 
                             const plPercent = safeCostBasis !== 0 ? ((safeValue - safeCostBasis) / Math.abs(safeCostBasis)) * 100 : 0;
                             const allocation = totalValue > 0 ? (safeValue / totalValue) * 100 : 0;

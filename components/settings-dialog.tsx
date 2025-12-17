@@ -24,7 +24,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { FileUploader } from "@/components/file-uploader"
-import { parseIBKRXml } from "@/lib/ibkr-parser"
+import { parseFlexReport } from "@/src/core/parser"
 
 interface SettingsDialogProps {
     onSettingsChanged?: () => void
@@ -117,7 +117,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
 
             const text = await file.text()
             try {
-                const parsed = parseIBKRXml(text)
+                const parsed = parseFlexReport(text)
                 allParsedData.push({
                     fileName: file.name,
                     cashTransactions: parsed.cashTransactions,

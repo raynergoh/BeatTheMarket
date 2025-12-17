@@ -30,6 +30,7 @@ interface DepositDebug {
     amount: number;
     originalAmount?: number;
     currency?: string;
+    originalCurrency?: string;
     description: string;
     type: string;
     transactionId?: string;
@@ -155,8 +156,8 @@ export function DataVerificationDialog({
                                                 {currencySymbol}{d.amount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
-                                                {d.originalAmount && d.currency && d.currency !== targetCurrency ? (
-                                                    `${d.originalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${d.currency}`
+                                                {d.originalAmount ? (
+                                                    `${d.originalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${d.originalCurrency || d.currency || ''}`
                                                 ) : '-'}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground hidden sm:table-cell truncate">{d.type}</TableCell>

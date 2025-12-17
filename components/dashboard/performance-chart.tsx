@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, DollarSign, TrendingDown, TrendingUp, Percent, HelpCircle, Info } from "lucide-react"
-import { PortfolioData } from "@/lib/ibkr-parser"
+import { PortfolioData } from "@/src/core/types"
 import { DataVerificationDialog } from "./data-verification-dialog"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 

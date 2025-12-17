@@ -1,4 +1,4 @@
-import { OpenPosition } from "@/lib/ibkr-parser";
+import { Asset } from "@/src/core/types";
 import { EnhancedSymbolData } from "@/lib/yahoo-finance";
 import { ETF_GEO_MAP, ETF_ASSET_MAP } from "@/lib/etf-geo-map";
 
@@ -11,7 +11,7 @@ export interface AllocationCategories {
 }
 
 export function calculateAllocations(
-    positions: OpenPosition[],
+    positions: Asset[],
     allEnhancedData: Record<string, EnhancedSymbolData>
 ): AllocationCategories {
     const allocationMaps = {
@@ -23,7 +23,7 @@ export function calculateAllocations(
     };
 
     positions.forEach(pos => {
-        const value = pos.value;
+        const value = pos.marketValue;
         if (value === 0) return;
 
         // 1. Asset Allocation
@@ -34,7 +34,7 @@ export function calculateAllocations(
             assetType = ETF_ASSET_MAP[pos.symbol];
         }
         // Trust IBKR Data for Cash
-        else if (pos.assetCategory === 'CASH' || ['USD', 'SGD', 'EUR', 'GBP', 'AUD', 'JPY', 'CAD', 'HKD', 'CNH'].includes(pos.symbol)) {
+        else if (pos.assetClass === 'CASH' || ['USD', 'SGD', 'EUR', 'GBP', 'AUD', 'JPY', 'CAD', 'HKD', 'CNH'].includes(pos.symbol)) {
             assetType = 'CASH';
         }
         else {

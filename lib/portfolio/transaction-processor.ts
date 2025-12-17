@@ -1,4 +1,4 @@
-import { CashTransaction, EquitySummary } from "@/lib/ibkr-parser";
+import { CashTransaction, EquitySummary } from "@/src/core/types";
 
 export interface ProcessedDeposits {
     date: string;

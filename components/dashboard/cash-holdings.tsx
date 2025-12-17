@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from "lucide-react";
-import { OpenPosition } from "@/lib/ibkr-parser";
+import { Asset, OpenPosition } from "@/src/core/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
     DropdownMenu,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface CashHoldingsProps {
-    holdings: OpenPosition[];
+    holdings: (Asset | OpenPosition)[];
     totalNetWorth: number; // To calculate % of portfolio if needed, or check for consistency
 }
 
@@ -36,7 +36,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
         const map = new Map<string, { amount: number, value: number }>();
 
         cashPositions.forEach(p => {
-            const curr = p.currency || p.symbol; // Fallback
+            const curr = (p as any).originalCurrency || p.currency || p.symbol; // Fallback to original currency if available
             const existing = map.get(curr) || { amount: 0, value: 0 };
 
             map.set(curr, {
