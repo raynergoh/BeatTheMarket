@@ -40,9 +40,7 @@ export async function POST(request: Request) {
         // Use IbkrProvider.fromParsedReport() to ensure identical processing as live token sync
         if (Array.isArray(manualHistory)) {
             const manualPortfolios = manualHistory.map((report: any) => {
-                const unified = IbkrProvider.fromParsedReport(report, 'IBKR-Manual');
-                logToFile(`BaseCurrency Result: stored=${report.baseCurrency}, equitySummaryCcy=${report.equitySummary?.[0]?.currency}, final=${unified.baseCurrency}`);
-                return unified;
+                return IbkrProvider.fromParsedReport(report, 'IBKR-Manual');
             });
             portfolios.push(...manualPortfolios);
         }

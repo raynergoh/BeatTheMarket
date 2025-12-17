@@ -39,169 +39,129 @@ export class PortfolioMerger {
 
         const portfolios: UnifiedPortfolio[] = [];
 
+        // ============================================================
+        // DETERMINISTIC ID-BASED GROUPING (replaces fuzzy NAV matching)
+        // ============================================================
+        // Step A: Group all portfolios by Account ID
+        // Step B: For same account, merge using "Latest Wins" priority
+        // Step C: Different accounts are summed (kept separate)
+        // ============================================================
+
         for (const [accId, group] of accountGroups) {
             if (group.length === 1) {
                 portfolios.push(group[0]);
                 continue;
             }
 
-            // A. Augment with Date Ranges
-            const augmented = group.map(p => {
-                let dates = p.equityHistory ? p.equityHistory.map(e => e.date).sort() : [];
-                return {
-                    p,
-                    start: dates.length > 0 ? dates[0] : '',
-                    end: dates.length > 0 ? dates[dates.length - 1] : '',
-                    dates: new Set(dates)
-                };
-            });
+            // Same account with multiple files -> STITCH (never sum)
+            // This handles: Manual uploads + Auto-sync, Historical + Recent, Duplicates
 
-            // B. Sort by Start Date ascending, then asOfDate descending (prefer newer files for same start)
-            augmented.sort((a, b) => {
-                if (a.start !== b.start) return a.start.localeCompare(b.start);
-                // If start same, prefer latest metadata timestamp
-                return (new Date(b.p.metadata.asOfDate).getTime() - new Date(a.p.metadata.asOfDate).getTime());
-            });
 
-            // C. Build Chains (Clusters of stitched portfolios)
-            const chains: typeof augmented[] = [];
+            // Sort by asOfDate (oldest to newest) - newest file has highest priority
+            const sortedByRecency = [...group].sort((a, b) =>
+                new Date(a.metadata.asOfDate).getTime() - new Date(b.metadata.asOfDate).getTime()
+            );
 
-            for (const item of augmented) {
-                let placed = false;
+            // The most recent file's assets are the source of truth
+            const latestFile = sortedByRecency[sortedByRecency.length - 1];
 
-                // Try to fit into an existing chain (Logic: Try last chain first for efficiency)
-                // Actually, due to sorting, we mostly care if it fits the "Tail" of the last chain.
-                if (chains.length > 0) {
-                    const lastChain = chains[chains.length - 1];
-                    const tail = lastChain[lastChain.length - 1];
 
-                    // Check Overlap with Tail
-                    // If Item Start > Tail End - Buffer(30d) -> Sequential (Stitch)
-                    // Else -> Overlap. Check Content.
+            // -------------------------------------------------------
+            // A. Equity History: "Latest Wins" for overlapping dates
+            // -------------------------------------------------------
+            // Process oldest to newest - each newer file overwrites older values
+            const equityMap = new Map<string, { date: string; nav: number }>();
 
-                    const isSequential = item.start > tail.end ||
-                        (new Date(item.start).getTime() > new Date(tail.end).getTime() - 30 * 86400000);
+            for (const p of sortedByRecency) {
+                if (p.equityHistory) {
+                    p.equityHistory.forEach(point => {
+                        // Newer file always overwrites older file for same date
+                        equityMap.set(point.date, point);
+                    });
+                }
+            }
 
-                    if (isSequential) {
-                        lastChain.push(item);
-                        placed = true;
-                    } else {
-                        // Overlap Detected. Check Content Similarity to determine Duplicate vs Partition.
-                        // We compare values on OVERLAPPING dates.
-                        let overlapCount = 0;
-                        let totalDiffPct = 0;
+            const consolidatedHistory = Array.from(equityMap.values())
+                .sort((a, b) => a.date.localeCompare(b.date));
 
-                        // Intersection of dates
-                        for (const d of item.dates) {
-                            if (tail.dates.has(d)) {
-                                const valA = tail.p.equityHistory!.find(x => x.date === d)!.nav;
-                                const valB = item.p.equityHistory!.find(x => x.date === d)!.nav;
 
-                                // Currency check
-                                if (tail.p.baseCurrency !== item.p.baseCurrency) {
-                                    // Diff Currency imply Partition (Safe default)
-                                    overlapCount = -1;
-                                    break;
-                                }
 
-                                if (valA > 0 || valB > 0) {
-                                    const maxV = Math.max(Math.abs(valA), Math.abs(valB));
-                                    if (maxV > 0) {
-                                        totalDiffPct += Math.abs(valA - valB) / maxV;
-                                    }
-                                }
-                                overlapCount++;
-                                if (overlapCount > 10) break; // Sample size sufficient
+            // -------------------------------------------------------
+            // B. Cash Flows: Deduplicate by ID (union)
+            // -------------------------------------------------------
+            const cashFlowMap = new Map<string, any>();
+            const cashFlowsWithoutId: any[] = [];
+
+            for (const p of sortedByRecency) {
+                if (p.cashFlows) {
+                    p.cashFlows.forEach(cf => {
+                        if (cf.id) {
+                            // Dedup by ID - latest file's version wins
+                            cashFlowMap.set(cf.id, cf);
+                        } else {
+                            // If no ID, dedupe by date+amount+type combo
+                            const key = `${cf.date}_${cf.amount}_${cf.type}`;
+                            if (!cashFlowMap.has(key)) {
+                                cashFlowMap.set(key, cf);
+                                cashFlowsWithoutId.push(cf);
                             }
                         }
+                    });
+                }
+            }
 
-                        // Decision
-                        const avgDiff = overlapCount > 0 ? totalDiffPct / overlapCount : 0;
-                        const isDuplicate = (overlapCount > 0) && (avgDiff < 0.05); // < 5% Diff -> Duplicate/Update
+            const consolidatedCashFlows = Array.from(cashFlowMap.values())
+                .sort((a, b) => a.date.localeCompare(b.date));
 
-                        if (isDuplicate) {
-                            // Verify timestamps. If item is NEWER, we want it.
-                            // Since we sorted by Start, we just append. Logic later will pick 'Latest' for same date.
-                            lastChain.push(item);
-                            placed = true;
-                        } else {
-                            // Partition (Different Values or different Ccy) -> New Chain
-                            // (Fall through to create new chain)
+
+
+            // -------------------------------------------------------
+            // C. Assets: Use ONLY the most recent file's positions
+            // -------------------------------------------------------
+            // Do NOT merge/sum positions from different files - use latest snapshot only
+            const consolidatedAssets = latestFile.assets;
+
+
+            // -------------------------------------------------------
+            // D. Transactions: Union (for reference, not used in calculations)
+            // -------------------------------------------------------
+            const allTransactions: CashTransaction[] = [];
+            const txnIds = new Set<string>();
+
+            for (const p of sortedByRecency) {
+                if (p.transactions) {
+                    p.transactions.forEach(txn => {
+                        const key = (txn as any).transactionId || `${txn.date}_${txn.amount}_${txn.type}`;
+                        if (!txnIds.has(key)) {
+                            txnIds.add(key);
+                            allTransactions.push(txn);
                         }
-                    }
-                }
-
-                if (!placed) {
-                    chains.push([item]);
+                    });
                 }
             }
 
-            // D. Consolidate Each Chain
-            for (const chain of chains) {
-                // If single item, just push
-                if (chain.length === 1) {
-                    portfolios.push(chain[0].p);
-                    continue;
+            // Create the stitched portfolio for this account
+            portfolios.push({
+                assets: consolidatedAssets,
+                cashBalance: latestFile.cashBalance, // Use latest snapshot's cash balance
+                baseCurrency: latestFile.baseCurrency,
+                transactions: allTransactions,
+                equityHistory: consolidatedHistory,
+                cashFlows: consolidatedCashFlows,
+                metadata: {
+                    provider: `STITCHED-${accId}`,
+                    asOfDate: latestFile.metadata.asOfDate,
+                    accountId: accId
                 }
-
-                // Merge Chain
-                // Sort by asOfDate desc (across whole chain) to find 'Latest Snapshot' source
-                const sortedByRecency = [...chain].sort((a, b) =>
-                    new Date(b.p.metadata.asOfDate).getTime() - new Date(a.p.metadata.asOfDate).getTime()
-                );
-                const latest = sortedByRecency[0].p;
-
-                // Merge Histories (Latest overwrites Oldest for same date)
-                const combinedHistoryMap = new Map<string, any>();
-
-                // We iterate Chain in order of Recency (Oldest File -> Newest File)
-                // Wait. `chain` is sorted by Start Date.
-                // We want "Better Data". Usually "Newer File" (asOfDate) has corrected data?
-                // Or maybe "Later File" (Start Date) has new data?
-                // Let's iterate `chain` (Time order).
-                // But if T1 covers Jan, T2 covers Jan (Update). T2 is newer.
-                // We want T2.
-                // So for each point, we might want to consult the 'freshest' source.
-
-                // Optimized: Just dump all points into a map, but order of dumping matters.
-                // We want LATEST METADATA source to win.
-                // So iterate `sortedByRecency` (Reverse: Oldest -> Newest).
-                for (let i = sortedByRecency.length - 1; i >= 0; i--) {
-                    const p = sortedByRecency[i].p;
-                    if (p.equityHistory) {
-                        p.equityHistory.forEach(point => combinedHistoryMap.set(point.date, point));
-                    }
-                }
-                const consolidatedHistory = Array.from(combinedHistoryMap.values()).sort((a, b) => a.date.localeCompare(b.date));
-
-                // Merge Cash Flows (Union by ID)
-                const combinedCashFlows: any[] = [];
-                const seenFlowIds = new Set<string>();
-                // Combine all flows
-                chain.forEach(item => {
-                    if (item.p.cashFlows) {
-                        item.p.cashFlows.forEach(cf => {
-                            if (cf.id && seenFlowIds.has(cf.id)) return;
-                            if (cf.id) seenFlowIds.add(cf.id);
-                            combinedCashFlows.push(cf);
-                        });
-                    }
-                });
-
-                // Transactions
-                const combinedTransactions: any[] = [];
-                chain.forEach(item => {
-                    if (item.p.transactions) combinedTransactions.push(...item.p.transactions);
-                });
-
-                portfolios.push({
-                    ...latest,
-                    equityHistory: consolidatedHistory,
-                    cashFlows: combinedCashFlows,
-                    transactions: combinedTransactions
-                });
-            }
+            });
         }
+
+        // ============================================================
+        // At this point, `portfolios` contains:
+        // - One stitched portfolio per unique Account ID
+        // - Different accounts will be SUMMED in the aggregation below
+        // ============================================================
+
 
         // 1. Prepare Aggregators
         let mergedAssets: Asset[] = [];

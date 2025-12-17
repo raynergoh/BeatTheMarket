@@ -253,7 +253,7 @@ class AssetFactory {
 
 **Location**: `src/core/utils/portfolio-merger.ts`
 
-Combines multiple `UnifiedPortfolio` objects (e.g., from multiple accounts) into one, with FX conversion.
+Combines multiple `UnifiedPortfolio` objects (e.g., from multiple accounts or time periods) into one, with FX conversion and deterministic grouping.
 
 ```mermaid
 flowchart TD
@@ -276,10 +276,15 @@ flowchart TD
 ```
 
 **Key Features**:
+- **Deterministic ID-Based Grouping**: Groups portfolios strictly by `metadata.accountId`. Same accountId = stitch (never sum), Different accountId = sum
+- **"Latest Wins" Strategy**: For overlapping dates in same-account files, data from the most recent file (by `asOfDate`) overwrites older data
+- **Asset Consolidation**: Uses ONLY the most recent file's positions for each account (prevents double-counting)
 - **Fill-Forward Equity History**: If one account has sparse NAV data, the merger fills gaps using the last known value
 - **Transfer Deduplication**: Internal transfers between accounts are identified and netted to avoid double-counting
 - **Preserve Original Values**: Per-share prices are NOT converted (preserved for display)
 - **Gap Detection**: Detects missing business days in equity history and returns warnings to the UI
+
+**Critical Fix (Dec 2024)**: Manual uploads (`settings-dialog.tsx`) now correctly store `accountId` in localStorage. Previously, the parser extracted it but didn't save it, causing identical accounts from manual uploads and auto-sync to be treated as separate entities and summed.
 
 ---
 

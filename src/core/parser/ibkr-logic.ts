@@ -95,10 +95,6 @@ export function parseFlexReport(xmlContent: string): ParsedFlexReport {
     equitySummary.sort((a, b) => a.reportDate.localeCompare(b.reportDate));
 
     // Extract Metadata from first statement or default
-    if (flexStatements.length > 0) {
-        console.log('[ibkr-logic] FlexStatement keys:', Object.keys(flexStatements[0]));
-        console.log('[ibkr-logic] accountCurrency:', flexStatements[0].accountCurrency, 'currencyCode:', flexStatements[0].currencyCode, 'currency:', flexStatements[0].currency);
-    }
     const baseCurrency = flexStatements.length > 0 ? (flexStatements[0].accountCurrency || flexStatements[0].currencyCode || flexStatements[0].currency || 'USD') : 'USD';
     const fromDate = flexStatements.length > 0 ? formatIbkrDate(flexStatements[0].fromDate || '') : '';
     const toDate = flexStatements.length > 0 ? formatIbkrDate(flexStatements[0].toDate || '') : '';

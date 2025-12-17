@@ -120,6 +120,7 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                 const parsed = parseFlexReport(text)
                 allParsedData.push({
                     fileName: file.name,
+                    accountId: parsed.accountId,    // CRITICAL: Must include this for deterministic merging
                     cashTransactions: parsed.cashTransactions,
                     equitySummary: parsed.equitySummary,
                     openPositions: parsed.openPositions,
