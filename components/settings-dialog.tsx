@@ -516,18 +516,62 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                         </AccordionTrigger>
                                         <AccordionContent className="pb-4">
                                             <div className="space-y-6 pt-2">
-                                                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                                                <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                                                     <div className="flex justify-between items-start">
                                                         <p className="font-medium text-foreground">Step 1: Setup Activity Flex Query</p>
-                                                        <a href="https://www.ibkrguides.com/orgportal/performanceandstatements/activityflex.htm" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
-                                                            Official Guide <ExternalLink className="h-3 w-3" />
+                                                        <a href="https://www.ibkrguides.com/orgportal/performanceandstatements/activityflex.htm" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-0.5">
+                                                            Official Guide<ExternalLink className="h-3 w-3" />
                                                         </a>
                                                     </div>
                                                     <p>Follow the steps in the <strong>Auto-Sync</strong> tab to create an <strong>Activity Flex Query</strong> with:</p>
                                                     <ul className="list-disc pl-4 text-xs space-y-1">
                                                         <li>Format: <strong>XML</strong></li>
-                                                        <li>Sections: <strong>Cash Report, Cash Transactions, NAV in Base, Open Positions</strong></li>
+                                                        <li>Sections:
+                                                            <ul className="list-disc pl-4 mt-1 space-y-0.5">
+                                                                <li><strong>Cash Report</strong></li>
+                                                                <li><strong>Cash Transactions</strong></li>
+                                                                <li><strong>NAV in Base</strong></li>
+                                                                <li><strong>Open Positions</strong></li>
+                                                                <li><strong>Transfers</strong></li>
+                                                                <li><strong>Financial Instrument Information</strong></li>
+                                                            </ul>
+                                                        </li>
                                                     </ul>
+
+                                                    {/* Important Rules Section */}
+                                                    <div className="bg-red-500/5 border border-red-500/20 p-3 rounded-lg space-y-2 mt-3">
+                                                        <p className="font-medium text-foreground flex items-center gap-2 text-xs">
+                                                            <AlertTriangle className="w-4 h-4 text-red-500" />
+                                                            Important Rules
+                                                        </p>
+
+                                                        {/* Strict File Structure Warning */}
+                                                        <div className="flex gap-2 items-start text-xs bg-red-500/10 text-red-600 dark:text-red-400 p-2 rounded border border-red-500/20">
+                                                            <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                                                            <p><strong>One Statement Per File:</strong> Do not generate a single XML file containing multiple Flex Statements. Each time period or account must be a <strong>separate download</strong>.</p>
+                                                        </div>
+
+                                                        {/* Asset Support */}
+                                                        <div className="flex gap-2 items-start text-xs bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 p-2 rounded border border-zinc-500/20">
+                                                            <HelpCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                                                            <p><strong>Supported Assets:</strong> Stocks, ETFs, and Single-Leg Options. <em>Complex derivatives (Futures, FOPs, Multi-leg strategies) are not fully supported.</em></p>
+                                                        </div>
+
+                                                        {/* Multi-File Logic */}
+                                                        <div className="space-y-1.5">
+                                                            <p className="text-xs text-muted-foreground font-medium">When to upload multiple files:</p>
+                                                            <ul className="text-xs text-muted-foreground space-y-1 ml-1">
+                                                                <li className="flex gap-2 items-start">
+                                                                    <span className="text-primary font-bold">•</span>
+                                                                    <span><strong>Combine Accounts:</strong> Upload files from different sub-accounts for the same time frame.</span>
+                                                                </li>
+                                                                <li className="flex gap-2 items-start">
+                                                                    <span className="text-primary font-bold">•</span>
+                                                                    <span><strong>Extend History:</strong> Upload files for the same account covering different time periods (e.g., <code className="bg-muted px-1 rounded">2023.xml</code>, <code className="bg-muted px-1 rounded">2024.xml</code>).</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div className="bg-muted/50 p-4 rounded-lg space-y-2">
@@ -543,35 +587,37 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                                                <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                                                     <p className="font-medium text-foreground">Step 3: Select Date Range</p>
                                                     <p>Select <strong>Custom Date Range</strong>. Choose a full year (e.g., Jan 1 - Dec 31) to capture historical data.</p>
-                                                    <div className="bg-background rounded overflow-hidden mt-2">
+
+                                                    {/* Date Gap Warning - Grey */}
+                                                    <div className="flex gap-2 items-start text-xs bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 p-3 rounded border border-zinc-500/20">
+                                                        <HelpCircle className="w-4 h-4 shrink-0" />
+                                                        <p><strong>Note:</strong> Ensure there are <strong>no significant gaps</strong> in your date ranges across files. It is okay if files have <strong>overlapping dates</strong>; the system will handle duplicates automatically.</p>
+                                                    </div>
+
+                                                    {/* Weekend Tip - Yellow */}
+                                                    <div className="flex gap-2 items-start text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 p-3 rounded border border-yellow-500/20">
+                                                        <AlertTriangle className="w-4 h-4 shrink-0" />
+                                                        <p><strong>Tip:</strong> Since IBKR only logs activity on weekdays, it is normal if your files don't start exactly on Jan 1 or end on Dec 31 if those dates fall on a weekend.</p>
+                                                    </div>
+
+                                                    <div className="bg-background rounded overflow-hidden">
                                                         <Image src="/images/guides/ibkr/ibkr-manual-step-3-date-range-light.png" alt="Select Date Range" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
                                                         <Image src="/images/guides/ibkr/ibkr-manual-step-3-date-range-dark.png" alt="Select Date Range" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
                                                     </div>
                                                 </div>
 
+
                                                 <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                                                     <p className="font-medium text-foreground">Step 4: Download & Upload</p>
                                                     <p>Click <strong>Run</strong> to generate the report. Download the XML file and upload it below.</p>
 
-                                                    {/* Recommended - Blue */}
+                                                    {/* Recommended File Naming - Blue */}
                                                     <div className="flex gap-2 items-start text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 p-3 rounded border border-blue-500/20">
                                                         <Lightbulb className="w-4 h-4 shrink-0" />
                                                         <p><strong>Recommended:</strong> Rename the file (e.g., <code className="bg-blue-500/20 px-1 rounded">2023.xml</code>) before uploading to easily identify the year.</p>
-                                                    </div>
-
-                                                    {/* Note - Grey */}
-                                                    <div className="flex gap-2 items-start text-xs bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 p-3 rounded border border-zinc-500/20">
-                                                        <HelpCircle className="w-4 h-4 shrink-0" />
-                                                        <p><strong>Note:</strong> Ensure there are <strong>no gaps</strong> in your date ranges. It is okay if files have <strong>overlapping dates</strong>; the system will handle duplicates automatically.</p>
-                                                    </div>
-
-                                                    {/* Tip - Yellow */}
-                                                    <div className="flex gap-2 items-start text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 p-3 rounded border border-yellow-500/20">
-                                                        <AlertTriangle className="w-4 h-4 shrink-0" />
-                                                        <p><strong>Tip:</strong> Since IBKR only logs activity on weekdays, it is normal if your files don't start exactly on Jan 1 or end on Dec 31 if those dates fall on a weekend.</p>
                                                     </div>
                                                 </div>
                                             </div>

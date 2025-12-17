@@ -1,82 +1,82 @@
 
-import { PortfolioProvider, UnifiedPortfolio, ParsedFlexReport } from '../types';
+import { PortfolioProvider, UnifiedPortfolio, ParsedFlexReport, Asset } from '../types';
 import { parseFlexReport } from './ibkr-logic';
 import { AssetFactory } from './asset-factory';
 
 export class IbkrProvider implements PortfolioProvider {
     name = 'Interactive Brokers XML';
 
+    /**
+     * Parse raw IBKR XML content into a UnifiedPortfolio.
+     * This is the primary entry point for live Flex Query data.
+     */
     parse(xmlContent: string): UnifiedPortfolio {
-        // 1. Parse raw XML using existing logic
         const report: ParsedFlexReport = parseFlexReport(xmlContent);
+        return IbkrProvider.mapToUnified(report, 'IBKR');
+    }
 
-        // 2. Normalize Assets
-        const assets = report.openPositions.map(p => AssetFactory.createFromIbkr(p));
+    /**
+     * Convert an already-parsed JSON report (from localStorage/manual upload) to UnifiedPortfolio.
+     * This ensures manual uploads use the exact same logic as live token syncs.
+     */
+    static fromParsedReport(report: ParsedFlexReport, providerLabel: string = 'IBKR-Manual'): UnifiedPortfolio {
+        return IbkrProvider.mapToUnified(report, providerLabel);
+    }
 
-        // 2b. Enhance with Granular Cash Reports if available
+    /**
+     * Core mapping logic: converts ParsedFlexReport to UnifiedPortfolio.
+     * Used by both parse() and fromParsedReport() to ensure consistency.
+     */
+    private static mapToUnified(report: ParsedFlexReport, providerLabel: string): UnifiedPortfolio {
+        // 1. Normalize Assets via Factory
+        const assets: Asset[] = (report.openPositions || []).map(p => AssetFactory.createFromIbkr(p));
+
+        // 2. Enhance with Granular Cash Reports if available
         if (report.cashReports && report.cashReports.length > 0) {
-            // Remove generic 'CASH' position if it exists (to avoid double counting with detailed reports)
-            // 'ibkr-logic' might have added a fallback 'CASH' asset. We must remove it if we have granular details.
+            // Remove generic 'CASH' position to avoid double counting with detailed reports
             for (let i = assets.length - 1; i >= 0; i--) {
                 if (assets[i].assetClass === 'CASH' && (assets[i].symbol === 'CASH' || assets[i].symbol === report.baseCurrency)) {
-                    // Logic: If the synthesized generic CASH is just the total base summary, we prefer granular.
-                    // But check if granular sum approx equals this? For now, we trust granular if present.
                     assets.splice(i, 1);
                 }
             }
 
-            // Add granular cash assets
+            // Add granular cash assets by currency
             report.cashReports.forEach((cr) => {
                 if (Math.abs(cr.totalCash) > 0.01) {
                     assets.push({
-                        symbol: cr.currency, // e.g. 'SGD'
+                        symbol: cr.currency,
                         description: `Cash (${cr.currency})`,
                         assetClass: 'CASH',
                         quantity: cr.totalCash,
-                        marketValue: cr.totalCash, // In Local Currency
-                        currency: cr.currency, // This is usually correct for the asset
-                        originalCurrency: cr.currency, // Explicitly set for CashHoldings breakdown
+                        marketValue: cr.totalCash,
+                        currency: cr.currency,
+                        originalCurrency: cr.currency,
                         getCollateralValue: () => cr.totalCash
                     });
                 }
             });
         }
 
-        // 3. Extract Cash Balance (Base Currency)
-        // We defer total cash calculation to the Merger/Consumer who has FX rates.
-        // But for this single portfolio, we might want to sum it up if we have a base currency context.
-        // However, IbkrProvider is synchronous and lacks rates.
-        // We will leave cashBalance as 0 or sum only Base Currency cash?
-        // UnifiedPortfolio.cashBalance usually implies Total Cash Value in Base.
-        // If we can't compute it accurately without rates, we might set it to just the Base Currency Portion?
-        // OR we rely on the generic 'CASH' position from EquitySummary (which IBKR calculates in Base).
-        // Since we REMOVED it from assets list, we should capture its value first!
-        // Wait, `ibkr-logic` synthesizes 'CASH' from EquitySummary which IS in Base.
-        // So `cashPos` (found before splice) has the correct Total Cash in Base.
-
-        let cashBalance = 0;
-        // Find the generic cash pos from IBKR's summary (which handles FX sum)
-        const summaryCashPos = report.openPositions.find(p => p.assetCategory === 'CASH' || p.symbol === 'CASH');
-        if (summaryCashPos) {
-            cashBalance = summaryCashPos.value; // Use 'value' which is usually in Base
-        } else if (report.equitySummary.length > 0) {
-            // Fallback
-            const lastEq = report.equitySummary[report.equitySummary.length - 1];
-            cashBalance = lastEq.cash || 0;
-        }
+        // 3. Cash Balance: Set to 0
+        // IMPORTANT: Cash is already included as individual CASH assets above.
+        // Setting cashBalance here would cause double-counting in net worth calculations.
+        const cashBalance = 0;
 
         // 4. Map Equity History
-        const equityHistory = report.equitySummary ? report.equitySummary.map(e => ({
+        const equityHistory = (report.equitySummary || []).map(e => ({
             date: e.reportDate,
-            nav: e.total // This is already in 'Base' currency if normalized, but ibkr-logic just parses.
-            // Ideally, we assume ibkr-logic returns what is in the XML.
-            // The Merger will handle Currency normalization across portfolios.
-        })) : [];
+            nav: e.total
+        }));
 
         // 5. Map Cash Flows (Net Invested Only)
-        // We rely on 'isNetInvestedFlow' flag set by parseCashTransactions
-        const cashFlows = report.cashTransactions
-            .filter(t => t.isNetInvestedFlow)
+        // Use isNetInvestedFlow flag if available, with fallback logic for older data
+        const cashFlows = (report.cashTransactions || [])
+            .filter(t =>
+                t.isNetInvestedFlow ||
+                (t.type === 'Deposits/Withdrawals' &&
+                    ['Deposit', 'Withdrawal', 'Electronic Fund Transfer'].some(k => t.description?.includes(k))) ||
+                t.type === 'Transfer'
+            )
             .map(t => ({
                 date: t.date,
                 amount: t.amount,
@@ -88,16 +88,26 @@ export class IbkrProvider implements PortfolioProvider {
                 originalCurrency: t.currency
             }));
 
+        // 6. Infer Base Currency
+        // Use EquitySummary.currency as source of truth (most reliable)
+        let baseCurrency = report.baseCurrency || 'USD';
+        if (report.equitySummary && report.equitySummary.length > 0) {
+            const eqCurrency = report.equitySummary[0].currency;
+            if (eqCurrency && eqCurrency !== baseCurrency) {
+                baseCurrency = eqCurrency;
+            }
+        }
+
         return {
             assets,
             cashBalance,
-            baseCurrency: report.baseCurrency,
-            transactions: report.cashTransactions,
+            baseCurrency,
+            transactions: report.cashTransactions || [],
             equityHistory,
             cashFlows,
             metadata: {
-                provider: 'IBKR',
-                asOfDate: report.toDate, // Using report end date
+                provider: providerLabel,
+                asOfDate: report.toDate,
                 accountId: report.accountId
             }
         };

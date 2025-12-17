@@ -135,7 +135,36 @@ interface PortfolioProvider {
 **Current Implementations**:
 - `IbkrProvider` ([ibkr-provider.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/ibkr-provider.ts))
 
----
+### Unified Code Paths
+
+Both data ingestion methods use **identical parsing logic**:
+
+| Method | Code Path |
+|--------|-----------|
+| **Token ID (Live Sync)** | `ibkrProvider.parse(xmlData)` |
+| **Manual XML Upload** | `IbkrProvider.fromParsedReport(jsonData)` |
+
+Both methods internally use the shared `mapToUnified()` method to ensure consistency:
+
+```typescript
+class IbkrProvider {
+    // For live XML from Flex Query
+    parse(xmlContent: string): UnifiedPortfolio {
+        const report = parseFlexReport(xmlContent);
+        return IbkrProvider.mapToUnified(report, 'IBKR');
+    }
+    
+    // For JSON from localStorage (manual upload)
+    static fromParsedReport(report: ParsedFlexReport): UnifiedPortfolio {
+        return IbkrProvider.mapToUnified(report, 'IBKR-Manual');
+    }
+    
+    // Shared core logic - both methods use this
+    private static mapToUnified(report, label): UnifiedPortfolio { ... }
+}
+```
+
+> **Key Design Decision**: The `cashBalance` field is set to `0` in `mapToUnified()` because cash holdings are already included as individual CASH assets in the `assets` array. This prevents double-counting in net worth calculations.
 
 ### 2. Asset Interface
 

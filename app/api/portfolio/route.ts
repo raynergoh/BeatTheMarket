@@ -12,7 +12,6 @@ import { calculateAllocations } from '@/lib/portfolio/allocator';
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { AssetFactory } from '@/src/core/parser/asset-factory'; // Added missing import
 
 const LOG_FILE = path.join(process.cwd(), 'debug_log_temp.txt');
 
@@ -37,43 +36,24 @@ export async function POST(request: Request) {
         let portfolios: UnifiedPortfolio[] = [];
         const ibkrProvider = new IbkrProvider();
 
-        // A. Manual History
+        // A. Manual History (previously parsed reports from localStorage)
+        // Use IbkrProvider.fromParsedReport() to ensure identical processing as live token sync
         if (Array.isArray(manualHistory)) {
-            // manualHistory contains raw parsed JSON objects (ParsedFlexReport structure)?
-            // Or XML strings?
-            // The frontend usually sends the PARSED object if it was parsed client-side or previously?
-            // Wait, existing `route.ts` treated `manualHistory` as `processedFiles` (ParsedFlexReport).
-            // line 42: `processedFiles = [...manualHistory];`
-            // `IbkrProvider.parse` expects XML string.
-            // If `manualHistory` is already parsed objects, `IbkrProvider.parse` won't work on them.
-            // `IbkrProvider` expects generic input? No, `parse(xmlContent: string)`.
-            // Check frontend `settings-dialog.tsx`:
-            // It likely saves the parsed JSON to localStorage.
-            // If so, I need an adapter to convert `ParsedFlexReport` (JSON) -> `UnifiedPortfolio`.
-            // OR I just map it manually here.
-            // `IbkrProvider` logic is mostly "Map ParsedReport -> Unified".
-            // I should extract the mapping logic from `IbkrProvider` into a static helper `mapParsedReportToUnified`?
-            // And `parse` calls that helper.
-            // If I can't easily change `IbkrProvider` now (I can, it's my code), I will do that.
-            // Let's assume I need to support already-parsed JSON.
-
-            // Quick fix: Add `fromParsed(report: any): UnifiedPortfolio` to IbkrProvider or just instantiate logic here?
-            // Cleaner: Add static method to IbkrProvider.
-
-            // For now, I will treat `manualHistory` objects carefully.
-            // If they look like parsed reports, I need to convert them.
-            // Existing `route.ts` just merged them.
-            // I'll add logic to convert them.
+            const manualPortfolios = manualHistory.map((report: any) => {
+                const unified = IbkrProvider.fromParsedReport(report, 'IBKR-Manual');
+                logToFile(`BaseCurrency Result: stored=${report.baseCurrency}, equitySummaryCcy=${report.equitySummary?.[0]?.currency}, final=${unified.baseCurrency}`);
+                return unified;
+            });
+            portfolios.push(...manualPortfolios);
         }
 
-        // B. Live Reports
+        // B. Live Reports (Token ID Flex Query)
         if (token && queryId) {
             const queryIds = queryId.split(',').map((id: string) => id.trim()).filter((id: string) => id.length > 0);
             for (const qId of queryIds) {
                 try {
                     const xmlData = await fetchFlexReport(token, qId);
                     const unified = ibkrProvider.parse(xmlData);
-                    // Add filename equivalent to metadata if needed
                     unified.metadata.provider = `IBKR-Live-${qId}`;
                     portfolios.push(unified);
                 } catch (err) {
@@ -81,136 +61,6 @@ export async function POST(request: Request) {
                     logToFile(`Error fetching query ${qId}: ${err}`);
                 }
             }
-        }
-
-        // Handle Manual History (JSON objects)
-        if (Array.isArray(manualHistory)) {
-            // We need to convert these "Old Parsed Objects" to "UnifiedPortfolio".
-            // Since they match `ParsedFlexReport` interface (mostly), we can feed them to a new helper in IbkrProvider?
-            // Or genericize IbkrProvider to accept Object?
-            // I'll manually map them here to save time on modifying Provider class again.
-            // They have: cashTransactions, openPositions, equitySummary...
-            // This matches `ParsedFlexReport`.
-            // I can instantiate my factory logic.
-            // Actually, I should update `IbkrProvider` to have `enrich(report: ParsedFlexReport): UnifiedPortfolio`.
-            // I will do inline mapping reusing `IbkrProvider` logic logic patterns.
-
-            // Dynamic import of Factory?
-            // AssetFactory is imported.
-            const manualPortfolios = manualHistory.map((report: any) => {
-                // Check if it has the required fields
-                // Reuse IbkrProvider logic...
-                // This is duplicate code. 
-                // It's better to modify IbkrProvider to expose `mapToUnified(report: ParsedFlexReport)`.
-                // I will assume for this step I will refactor `IbkrProvider` to have `mapToUnified`.
-                // BUT I can't do that inside `write_to_file`.
-                // So I will defer that change and write the `manual` loop here.
-
-                const assets = (report.openPositions || []).map((p: any) => {
-                    // Check if AssetFactory needs modifying? import 'AssetFactory'
-                    // We need to import AssetFactory in route.ts!
-                    // I did not import it in the file content above. 
-                    // I MUST add `import { AssetFactory } from '@/src/core/parser/asset-factory';`
-                    return AssetFactory.createFromIbkr(p);
-                    // CommonJS require in TS module? No.
-                    // I will add the import to the top block.
-                });
-
-                // Reuse granular cash logic?
-                if (report.cashReports && report.cashReports.length > 0) {
-                    // ... splice/push logic ...
-                    // This is gettting messy. 
-                    // I SHOULD have refactored IbkrProvider to be usable with JSON.
-                    // I will proceed with just basic mapping and accept I might miss granular cash for manual history for now?
-                    // Or copy-paste the granular logic.
-                }
-
-                // Mapping Equity History
-                const equityHistory = report.equitySummary ? report.equitySummary.map((e: any) => ({
-                    date: e.reportDate,
-                    nav: e.total
-                })) : [];
-
-                // Mapping CashFlows
-                // Note: Old manual history might not have 'isNetInvestedFlow' pre-calculated if it was saved long ago?
-                // `processTransactions` in `cash-flows.ts` sets it.
-                // If manualHistory was saved with OLD parser instructions, it might be missing fields.
-                // This is a risk.
-                // If `isNetInvestedFlow` is missing, we default to All Deposits?
-                // Safe assumption: If I re-parse the raw XML it would be fine. But I only have the JSON.
-                // If JSON lacks `isNetInvestedFlow`, I'm in trouble.
-                // BUT: The frontend `manualHistory` usually comes from `localForage` stores which store... 
-                // The outputs of `parseFlexReport`.
-                // Any NEW parsing will have the flag. OLD data might not.
-                // If OLD data, `filter(t => t.isNetInvestedFlow)` returns empty.
-                // I should check if `type` implies deposit.
-
-                const cashFlows = (report.cashTransactions || [])
-                    .filter((t: any) => t.isNetInvestedFlow || (t.type === 'Deposits/Withdrawals' && ['Deposit', 'Withdrawal', 'Electronic Fund Transfer'].some(k => t.description?.includes(k))) || t.type === 'Transfer')
-                    .map((t: any) => ({
-                        date: t.date,
-                        amount: t.amount,
-                        type: (t.amount >= 0 ? 'DEPOSIT' : 'WITHDRAWAL') as 'DEPOSIT' | 'WITHDRAWAL',
-                        currency: t.currency,
-                        id: t.transactionId,
-                        description: t.description,
-                        originalAmount: t.amount,
-                        originalCurrency: t.currency
-                    }));
-
-                // 3b. Enhance with Granular Cash Reports if available in manual history
-                if (report.cashReports && report.cashReports.length > 0) {
-                    // Deduplicate generic cash
-                    const genericCashIndex = assets.findIndex((a: Asset) => a.assetClass === 'CASH' && (a.symbol === 'CASH' || a.symbol === report.baseCurrency));
-                    if (genericCashIndex >= 0) {
-                        assets.splice(genericCashIndex, 1);
-                    }
-
-                    report.cashReports.forEach((cr: any) => {
-                        if (Math.abs(cr.totalCash) > 0.01) {
-                            assets.push({
-                                symbol: cr.currency,
-                                description: `Cash (${cr.currency})`,
-                                assetClass: 'CASH',
-                                quantity: cr.totalCash,
-                                marketValue: cr.totalCash,
-                                currency: cr.currency,
-                                originalCurrency: cr.currency,
-                                getCollateralValue: () => cr.totalCash
-                            });
-                        }
-                    });
-                }
-                // Infer baseCurrency: Use EquitySummary.currency as the source of truth.
-                // EquitySummaryInBase is ALWAYS reported in the account's base currency.
-                // Fall back to report.baseCurrency, then 'USD' only as last resort.
-                let inferredBaseCurrency = report.baseCurrency || 'USD';
-
-                // Check EquitySummary for currency field (most reliable)
-                if (report.equitySummary && report.equitySummary.length > 0) {
-                    const eqCurrency = report.equitySummary[0].currency;
-                    if (eqCurrency && eqCurrency !== inferredBaseCurrency) {
-                        logToFile(`BaseCurrency Override: Using EquitySummary.currency=${eqCurrency} instead of stored=${inferredBaseCurrency}`);
-                        inferredBaseCurrency = eqCurrency;
-                    }
-                }
-                logToFile(`BaseCurrency Result: stored=${report.baseCurrency}, equitySummaryCcy=${report.equitySummary?.[0]?.currency}, final=${inferredBaseCurrency}`);
-
-                return {
-                    assets,
-                    cashBalance: 0, // Recalculated by merger
-                    baseCurrency: inferredBaseCurrency,
-                    transactions: report.cashTransactions || [],
-                    equityHistory,
-                    cashFlows,
-                    metadata: {
-                        provider: 'IBKR-Manual',
-                        asOfDate: report.toDate,
-                        accountId: report.accountId
-                    }
-                } as UnifiedPortfolio;
-            });
-            portfolios.push(...manualPortfolios);
         }
 
         if (portfolios.length === 0) {
@@ -426,7 +276,9 @@ export async function POST(request: Request) {
             const categories = calculateAllocations(unified.assets, enhancedData);
 
             // Calculate Net Worth for use in holdings % calculation
-            const computedNetWorth = unified.cashBalance + unified.assets.reduce((s, a) => s + a.marketValue, 0);
+            // Note: Do NOT add cashBalance separately - CASH is already included as assets in unified.assets
+            // Adding cashBalance would double-count cash holdings
+            const computedNetWorth = unified.assets.reduce((s, a) => s + a.marketValue, 0);
 
             return NextResponse.json({
                 comparison: verificationData,
