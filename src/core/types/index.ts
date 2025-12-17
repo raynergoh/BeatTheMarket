@@ -117,6 +117,12 @@ export interface ComparisonPoint {
     portfolioValue?: number;
 }
 
+export interface ETFHolding {
+    symbol: string;
+    holdingPercent: number;
+    name?: string;
+}
+
 export interface EnhancedSymbolData {
     symbol: string;
     shortName: string;
@@ -127,7 +133,7 @@ export interface EnhancedSymbolData {
     beta?: number;
     trailingPE?: number;
     dividendYield?: number;
-    topHoldings?: any[]; // For ETFs
+    topHoldings?: ETFHolding[];
 }
 
 // --- Parsing Output ---

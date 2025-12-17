@@ -69,8 +69,13 @@ export async function POST(request: Request) {
 
         // 2. Merge Step
         logToFile('Merging portfolios...');
-        const unified = await PortfolioMerger.merge(portfolios, targetCurrency);
+        const mergeResult = await PortfolioMerger.merge(portfolios, targetCurrency);
+        const unified = mergeResult.portfolio;
+        const mergeWarnings = mergeResult.warnings;
         logToFile(`Merged Portfolio: Found ${unified.assets.length} assets, ${unified.cashFlows.length} cash flows.`);
+        if (mergeWarnings.length > 0) {
+            logToFile(`Merge Warnings: ${mergeWarnings.join('; ')}`);
+        }
 
         // 3. Engine Step: Benchmarking
         // Need to calculate Comparison vs SPY (in Target Currency)
@@ -301,7 +306,8 @@ export async function POST(request: Request) {
                 categories,
                 baseCurrency: targetCurrency,
                 targetCurrency: targetCurrency,
-                deposits: deposits // Pass for debug/verification dialog
+                deposits: deposits, // Pass for debug/verification dialog
+                warnings: mergeWarnings // Gap detection warnings
             });
         }
 
@@ -309,7 +315,8 @@ export async function POST(request: Request) {
         return NextResponse.json({
             comparison: [],
             benchmarkValue: 0,
-            deposits: []
+            deposits: [],
+            warnings: mergeWarnings // Gap detection warnings
         });
     } catch (error: any) {
         console.error('API Error:', error);

@@ -5,14 +5,22 @@ import { getHistoricalFxRates } from '@/lib/finance/fx-rates';
 // Checking imports showed it in src/core/engine/currency
 import { getRateWithLookback } from '../engine/currency';
 
+export interface MergeResult {
+    portfolio: UnifiedPortfolio;
+    warnings: string[];
+}
+
 export class PortfolioMerger {
     /**
      * Merges multiple UnifiedPortfolio objects into a single one.
      * Normalizes all values to the targetCurrency.
      */
-    static async merge(rawPortfolios: UnifiedPortfolio[], targetCurrency: string = 'USD'): Promise<UnifiedPortfolio> {
+    static async merge(rawPortfolios: UnifiedPortfolio[], targetCurrency: string = 'USD'): Promise<MergeResult> {
         if (rawPortfolios.length === 0) {
-            return PortfolioMerger.createEmpty(targetCurrency);
+            return {
+                portfolio: PortfolioMerger.createEmpty(targetCurrency),
+                warnings: []
+            };
         }
 
         // 0. Pre-process: Smart Consensus for Account Consolidation
@@ -496,18 +504,59 @@ export class PortfolioMerger {
         // Sort Cash Flows
         mergedCashFlows.sort((a, b) => a.date.localeCompare(b.date));
 
-        return {
-            assets: mergedAssets,
-            cashBalance: totalCashBalance,
-            baseCurrency: targetCurrency,
-            transactions: mergedTransactions,
-            equityHistory: sortedHistory,
-            cashFlows: mergedCashFlows,
-            metadata: {
-                provider: 'MERGED',
-                asOfDate: new Date().toISOString().split('T')[0],
-                accountId: 'ALL'
+        // 5. Gap Detection in Equity History
+        const warnings: string[] = [];
+        if (sortedHistory.length > 1) {
+            const isWeekend = (date: Date) => {
+                const day = date.getDay();
+                return day === 0 || day === 6;
+            };
+
+            const getBusinessDays = (startDate: Date, endDate: Date) => {
+                let count = 0;
+                const cur = new Date(startDate);
+                cur.setDate(cur.getDate() + 1);
+                while (cur < endDate) {
+                    if (!isWeekend(cur)) {
+                        count++;
+                    }
+                    cur.setDate(cur.getDate() + 1);
+                }
+                return count;
+            };
+
+            for (let i = 0; i < sortedHistory.length - 1; i++) {
+                const currentDate = new Date(sortedHistory[i].date);
+                const nextDate = new Date(sortedHistory[i + 1].date);
+
+                const diffTime = Math.abs(nextDate.getTime() - currentDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 2) {
+                    const missingBusinessDays = getBusinessDays(currentDate, nextDate);
+                    // Warn if more than 2 business days missing (allows for holidays)
+                    if (missingBusinessDays > 2) {
+                        warnings.push(`Data Gap Detected: No records between ${sortedHistory[i].date} and ${sortedHistory[i + 1].date} (${missingBusinessDays} missing business days).`);
+                    }
+                }
             }
+        }
+
+        return {
+            portfolio: {
+                assets: mergedAssets,
+                cashBalance: totalCashBalance,
+                baseCurrency: targetCurrency,
+                transactions: mergedTransactions,
+                equityHistory: sortedHistory,
+                cashFlows: mergedCashFlows,
+                metadata: {
+                    provider: 'MERGED',
+                    asOfDate: new Date().toISOString().split('T')[0],
+                    accountId: 'ALL'
+                }
+            },
+            warnings
         };
     }
 

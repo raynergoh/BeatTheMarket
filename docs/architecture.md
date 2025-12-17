@@ -279,6 +279,7 @@ flowchart TD
 - **Fill-Forward Equity History**: If one account has sparse NAV data, the merger fills gaps using the last known value
 - **Transfer Deduplication**: Internal transfers between accounts are identified and netted to avoid double-counting
 - **Preserve Original Values**: Per-share prices are NOT converted (preserved for display)
+- **Gap Detection**: Detects missing business days in equity history and returns warnings to the UI
 
 ---
 
@@ -291,6 +292,7 @@ flowchart TD
 | [ibkr-provider.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/ibkr-provider.ts) | IBKR implementation of `PortfolioProvider` |
 | [ibkr-logic.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/ibkr-logic.ts) | Low-level XML parsing functions |
 | [asset-factory.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/asset-factory.ts) | Creates standardized `Asset` objects |
+| [provider-registry.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/provider-registry.ts) | Provider registration for Open-Closed compliance |
 | [cash-flows.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/cash-flows.ts) | Extracts and categorizes cash transactions |
 | [transfers.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/transfers.ts) | Internal transfer detection logic |
 | [index.ts](file:///Users/raynergoh/BeatTheMarket/src/core/parser/index.ts) | Convenience re-exports |
@@ -518,11 +520,19 @@ flowchart TD
    }
    ```
 
-4. **Register in route.ts**:
+4. **Register the provider** (preferred method using registry):
    ```typescript
-   // In app/api/portfolio/route.ts
-   if (body.provider === 'schwab') {
-       const provider = new SchwabProvider();
+   // In src/core/parser/provider-registry.ts
+   import { SchwabProvider } from './schwab-provider';
+   registerProvider('schwab', new SchwabProvider());
+   ```
+
+   Or, for ad-hoc usage in route.ts:
+   ```typescript
+   import { getProvider } from '@/src/core/parser';
+   
+   const provider = getProvider('schwab');
+   if (provider) {
        portfolios.push(provider.parse(body.csvContent));
    }
    ```
@@ -586,14 +596,15 @@ To add a new calculation (e.g., Sharpe Ratio):
 ### Files Changed/Created
 
 **New Files**:
-- `src/core/types/index.ts` - Core type definitions
+- `src/core/types/index.ts` - Core type definitions (including `ETFHolding`)
 - `src/core/parser/ibkr-provider.ts` - IBKR provider
 - `src/core/parser/asset-factory.ts` - Asset creation factory
+- `src/core/parser/provider-registry.ts` - Provider registration for extensibility
 - `src/core/parser/cash-flows.ts` - Cash flow extraction
 - `src/core/parser/transfers.ts` - Transfer handling
 - `src/core/engine/benchmark.ts` - Benchmark calculation
 - `src/core/engine/currency.ts` - Currency utilities
-- `src/core/utils/portfolio-merger.ts` - Portfolio merging
+- `src/core/utils/portfolio-merger.ts` - Portfolio merging with gap detection
 - `src/core/constants/index.ts` - Shared constants
 
 **Refactored Files**:
