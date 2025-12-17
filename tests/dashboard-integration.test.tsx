@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { parseIBKRXml } from '../lib/ibkr-parser';
-import { calculateComparison, Deposit, BenchmarkPrice } from '../lib/calculation-engine';
+import { parseFlexReport } from '../src/core/parser';
+import { calculateComparison } from '../src/core/engine/benchmark';
+import { Deposit, BenchmarkPrice } from '../src/core/types';
 import { SummaryCards } from '../components/dashboard/summary-cards';
 import { PerformanceChart } from '../components/dashboard/performance-chart';
 import fs from 'fs';
@@ -16,7 +17,7 @@ describe('Dashboard Integration (2025.xml)', () => {
     const xmlContent = readTestFile('2025.xml');
 
     // 1. Parsing
-    const parsed = parseIBKRXml(xmlContent);
+    const parsed = parseFlexReport(xmlContent);
     const { cashTransactions } = parsed;
 
     // 2. Data Processing (Simulating API logic)

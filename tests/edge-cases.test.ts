@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseIBKRXml } from '../lib/ibkr-parser';
+import { parseFlexReport } from '../src/core/parser';
 import fs from 'fs';
 import path from 'path';
 
@@ -21,7 +21,7 @@ describe('Edge Case Fuzzing', () => {
         // Also try SecurityInfo if present
         const corrupted2 = corrupted.replace(/<SecurityInfo>[\s\S]*?<\/SecurityInfo>/g, '');
 
-        const result = parseIBKRXml(corrupted2);
+        const result = parseFlexReport(corrupted2);
 
         // Assert it didn't crash
         expect(result).toBeDefined();
@@ -42,7 +42,7 @@ describe('Edge Case Fuzzing', () => {
         // Case: Change a currency to "XYZ"
         const corrupted = validXml.replace(/currency="USD"/g, 'currency="XYZ"');
 
-        const result = parseIBKRXml(corrupted);
+        const result = parseFlexReport(corrupted);
 
         const xyzTrans = result.cashTransactions.find(t => t.currency === 'XYZ');
         expect(xyzTrans).toBeDefined();
@@ -52,7 +52,7 @@ describe('Edge Case Fuzzing', () => {
         // Case: Change date format from YYYYMMDD to "InvalidDateString" (length > 8 to avoid formatting attempt)
         const corrupted = validXml.replace(/dateTime="2025\d{4}/g, 'dateTime="InvalidDateString');
 
-        const result = parseIBKRXml(corrupted);
+        const result = parseFlexReport(corrupted);
 
         const badDateTrans = result.cashTransactions.find(t => t.date.includes('InvalidDateString'));
         expect(badDateTrans).toBeDefined();
@@ -60,6 +60,6 @@ describe('Edge Case Fuzzing', () => {
 
     it('should throw error if XML structure is completely broken', () => {
         const corrupted = validXml.substring(0, validXml.length / 2);
-        expect(() => parseIBKRXml(corrupted)).toThrow();
+        expect(() => parseFlexReport(corrupted)).toThrow();
     });
 });

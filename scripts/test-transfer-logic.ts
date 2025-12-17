@@ -1,7 +1,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { parseIBKRXml } from '../lib/ibkr-parser';
+import { parseFlexReport } from '../src/core/parser/index';
 
 const mainXmlPath = path.join(process.cwd(), 'xml_test_files', 'JG-main.xml');
 const optionXmlPath = path.join(process.cwd(), 'xml_test_files', 'JG-option.xml');
@@ -15,8 +15,8 @@ if (!fs.existsSync(mainXmlPath) || !fs.existsSync(optionXmlPath)) {
 const mainContent = fs.readFileSync(mainXmlPath, 'utf-8');
 const optionContent = fs.readFileSync(optionXmlPath, 'utf-8');
 
-const mainData = parseIBKRXml(mainContent);
-const optionData = parseIBKRXml(optionContent);
+const mainData = parseFlexReport(mainContent);
+const optionData = parseFlexReport(optionContent);
 
 // Test Cases
 const testCases = [

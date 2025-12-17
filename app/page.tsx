@@ -30,7 +30,7 @@ import { SettingsDialog } from "@/components/settings-dialog";
 import { CashHoldings } from "@/components/dashboard/cash-holdings";
 import { CategoriesCard } from "@/components/dashboard/categories-card";
 import { GuideModal } from "@/components/guide-modal";
-import { OpenPosition } from "@/lib/ibkr-parser";
+import { OpenPosition } from "@/src/core/types";
 
 interface ComparisonPoint {
   date: string;

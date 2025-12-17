@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { parseIBKRXml } from './ibkr-parser';
+import { parseFlexReport } from '../src/core/parser';
 import fs from 'fs';
 import path from 'path';
 
-describe('parseIBKRXml', () => {
+describe('parseFlexReport', () => {
     it('should parse valid IBKR XML correctly', () => {
         const xmlContent = fs.readFileSync(path.resolve(__dirname, '../tests/fixtures/sample-ibkr.xml'), 'utf-8');
-        const result = parseIBKRXml(xmlContent);
+        const result = parseFlexReport(xmlContent);
 
         expect(result).toBeDefined();
 
@@ -16,7 +16,7 @@ describe('parseIBKRXml', () => {
             amount: 1000.00,
             currency: 'USD',
             description: 'Deposit',
-            transactionId: 'TX123'
+            transactionId: 'TX123-undefined' // accountId was not in test fixture
         });
 
         // Check Open Positions
@@ -39,13 +39,13 @@ describe('parseIBKRXml', () => {
 
     it('should throw error for non-XML content', () => {
         const invalidContent = "This is not XML";
-        expect(() => parseIBKRXml(invalidContent)).toThrow('Received data is not XML');
+        expect(() => parseFlexReport(invalidContent)).toThrow('Received data is not XML');
     });
 
     it('should handle empty or malformed XML gracefully', () => {
         // Valid XML but missing FlexQueryResponse
         const malformedXML = "<Root></Root>";
-        expect(() => parseIBKRXml(malformedXML)).toThrow('Invalid IBKR XML');
+        expect(() => parseFlexReport(malformedXML)).toThrow('Invalid IBKR XML');
     });
 
     it('should synthesize cash position from EquitySummary if missing in OpenPositions', () => {
@@ -62,7 +62,7 @@ describe('parseIBKRXml', () => {
         </FlexQueryResponse>
         `;
 
-        const result = parseIBKRXml(xmlWithoutPositions);
+        const result = parseFlexReport(xmlWithoutPositions);
         expect(result.openPositions).toHaveLength(1);
         expect(result.openPositions[0].symbol).toBe('CASH');
         expect(result.openPositions[0].quantity).toBe(200.00);

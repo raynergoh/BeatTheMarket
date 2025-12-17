@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseIBKRXml } from '../lib/ibkr-parser';
+import { parseFlexReport } from '../src/core/parser';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,7 +12,7 @@ describe('Core Logic - Real Datasets', () => {
 
     describe('Multi-Currency Normalization (JG-main.xml)', () => {
         const xmlContent = readTestFile('JG-main.xml');
-        const result = parseIBKRXml(xmlContent);
+        const result = parseFlexReport(xmlContent);
 
         it('should correctly identify SGD deposits in SGD-base account', () => {
             // JG-main is likely SGD base.
@@ -61,8 +61,8 @@ describe('Core Logic - Real Datasets', () => {
         const mainXml = readTestFile('JG-main.xml');
         const optionXml = readTestFile('JG-option.xml');
 
-        const mainResult = parseIBKRXml(mainXml);
-        const optionResult = parseIBKRXml(optionXml);
+        const mainResult = parseFlexReport(mainXml);
+        const optionResult = parseFlexReport(optionXml);
 
         it('should correctly tag transfer outflows and inflows', () => {
             // Look for the $80k transfer mentioned by user
@@ -73,15 +73,15 @@ describe('Core Logic - Real Datasets', () => {
             // Let's filter for large transactions around 80k.
 
             const findTransfer = (transactions: any[], minAmount: number) => {
-                return transactions.find(t => Math.abs(t.amount) >= minAmount && (t.type.includes('Transfer') || t.type.includes('Wire') || t.description.includes('Transfer')));
+                return transactions.find(t => Math.abs(t.amount) >= minAmount && (t.type?.includes('Transfer') || t.type?.includes('Wire') || t.description.includes('Transfer')));
             };
 
             // Using 70000 to be safe if it's not exactly 80k or is in different currency
             const mainTransfer = mainResult.transfers.find(t => Math.abs(t.amount) > 70000)
-                || mainResult.cashTransactions.find(t => Math.abs(t.amount) > 70000 && t.type.includes('Transfer'));
+                || mainResult.cashTransactions.find(t => Math.abs(t.amount) > 70000 && t.type?.includes('Transfer'));
 
             const optionTransfer = optionResult.transfers.find(t => Math.abs(t.amount) > 70000)
-                || optionResult.cashTransactions.find(t => Math.abs(t.amount) > 70000 && t.type.includes('Transfer'));
+                || optionResult.cashTransactions.find(t => Math.abs(t.amount) > 70000 && t.type?.includes('Transfer'));
 
             // If actual file data differs slightly, we relax assertions to "found something"
             // The user says "Assert that the $80k USD outflow... and $80k USD inflow... are correctly tagged"
@@ -123,7 +123,7 @@ describe('Core Logic - Real Datasets', () => {
 
     describe('Options Benchmarking (JG-option.xml)', () => {
         const xmlContent = readTestFile('JG-option.xml');
-        const result = parseIBKRXml(xmlContent);
+        const result = parseFlexReport(xmlContent);
 
         it('should parse Options with correct Multiplier', () => {
             // Find an Option position
