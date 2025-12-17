@@ -65,12 +65,15 @@ BeatTheMarket is capable of ingesting data directly from **Interactive Brokers**
 
 ## Future Roadmap
 
-We are consistently shipping updates. Our priority is **User Experience** -> **Deep Analytics** -> **Expansion**.
+We are consistently shipping updates. Our priority is **Broker Expansion** → **Deep Analytics** → **Ecosystem**.
 
-### 1. Core Experience (High Priority)
-*   **Local Data Persistence**: Implement IndexedDB support so your data stays in your browser. No need to re-upload files on every visit.
-*   **PWA Support**: Install BeatTheMarket as a Progressive Web App for offline access.
+### 1. Broker Expansion (High Priority)
+*   **Tiger Brokers**: Full support for Tiger's data export format.
+*   **Moomoo**: Integration with Moomoo's portfolio export.
+*   **Webull**: Support for Webull users.
+*   **CSV Import**: Generic adapter for custom data import from any source.
 
+> **Note**: Our architecture has been refactored with a modular provider-based system, making it straightforward to add new broker integrations.
 
 ### 2. Advanced Analytics
 *   **Dividend Intelligence**: Calendar view, Yield on Cost tracking, and Dividend Growth visualizations.
@@ -78,13 +81,10 @@ We are consistently shipping updates. Our priority is **User Experience** -> **D
 *   **Per-Position Alpha**: Calculate the exact MWR for each individual holding and compare it to a "Ghost Position" of the benchmark bought at the same times. See exactly which stocks contributed to your outperformance.
 *   **Custom Benchmarking**: Compare against any ticker (QQQ, ARKK, BRK.B), not just indices.
 
-### 3. Broker Expansion
-*   **Webull**, **Tiger Brokers**, **Moomoo** support.
-*   **CSV Import**: Generic adapter for custom data import.
-
-### 4. Ecosystem & Insights
+### 3. Ecosystem & Insights
 *   **Fundamental Data Overlay**: P/E, PEG, and Earnings dates on your holdings.
 *   **Anonymous Peer Comparison**: See how your Alpha percentile ranks against other users (opt-in).
+*   **PWA Support**: Install BeatTheMarket as a Progressive Web App for offline access.
 
 ## Getting Started
 
