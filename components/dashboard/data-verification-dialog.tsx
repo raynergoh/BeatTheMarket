@@ -142,7 +142,7 @@ export function DataVerificationDialog({
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[75px] xs:w-[85px]">Date</TableHead>
-                                        <TableHead>Amount</TableHead>
+                                        <TableHead className="pl-4 sm:pl-8 md:pl-16">Amount</TableHead>
                                         <TableHead>Original</TableHead>
                                         <TableHead className="hidden sm:table-cell">Type</TableHead>
                                         <TableHead className="hidden md:table-cell">Description</TableHead>
@@ -152,7 +152,7 @@ export function DataVerificationDialog({
                                     {deposits.map((d, i) => (
                                         <TableRow key={i}>
                                             <TableCell>{d.date}</TableCell>
-                                            <TableCell className={`font-medium ${d.amount < 0 ? "text-red-500" : "text-green-600"}`}>
+                                            <TableCell className={`pl-4 sm:pl-8 md:pl-16 font-medium ${d.amount < 0 ? "text-red-500" : "text-green-600"}`}>
                                                 {currencySymbol}{d.amount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
