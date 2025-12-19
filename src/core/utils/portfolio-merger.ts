@@ -1,4 +1,3 @@
-
 import { UnifiedPortfolio, Asset, CashTransaction } from '../types';
 import { getHistoricalFxRates } from '@/lib/finance/fx-rates';
 // We assume getRateWithLookback is available or we implement it here.
@@ -12,8 +11,19 @@ export interface MergeResult {
 
 export class PortfolioMerger {
     /**
-     * Merges multiple UnifiedPortfolio objects into a single one.
-     * Normalizes all values to the targetCurrency.
+     * Generate composite key to ensure account IDs are unique within provider context.
+     * This prevents collisions like IBKR-12345 vs SCHWAB-12345.
+     */
+    private static getCompositeKey(portfolio: UnifiedPortfolio): string {
+        const provider = portfolio.metadata.provider || 'UNKNOWN_PROVIDER';
+        const accountId = portfolio.metadata.accountId || 'UNKNOWN_ACCOUNT';
+        return `${provider}::${accountId}`;
+    }
+
+    /**
+     * Two-Phase Merge:
+     * Phase 1: Stitch portfolios with same provider+accountId (time-series extension)
+     * Phase 2: Sum all unique accounts into one master portfolio
      */
     static async merge(rawPortfolios: UnifiedPortfolio[], targetCurrency: string = 'USD'): Promise<MergeResult> {
         if (rawPortfolios.length === 0) {
@@ -23,38 +33,49 @@ export class PortfolioMerger {
             };
         }
 
-        // 0. Pre-process: Smart Consensus for Account Consolidation
-        // We group by Account ID, but we must decide whether to STITCH (Merge/Overwrite) or SUM (Separate).
-        // Scenarios:
-        // 1. Time Extension (Year 1, Year 2) -> Stitch.
-        // 2. Update/Duplicate (Year 1 v1, Year 1 v2) -> Stitch.
-        // 3. Partition (Main, Options) -> Sum.
+        // PHASE 1: STITCHING - Group by Composite Key (provider::accountId)
+        const stitchedPortfolios = await PortfolioMerger.stitchByCompositeKey(rawPortfolios);
 
+        // PHASE 2: SUMMATION - Aggregate all unique accounts
+        return await PortfolioMerger.sumPortfolios(stitchedPortfolios, targetCurrency);
+    }
+
+    /**
+     * Phase 1: Stitch portfolios that represent the same account at different times.
+     * Groups by composite key (provider::accountId) and uses "Latest Wins" for overlapping dates.
+     */
+    private static async stitchByCompositeKey(rawPortfolios: UnifiedPortfolio[]): Promise<UnifiedPortfolio[]> {
         const accountGroups = new Map<string, UnifiedPortfolio[]>();
+
         rawPortfolios.forEach(p => {
-            const accId = p.metadata.accountId || 'UNKNOWN';
-            if (!accountGroups.has(accId)) accountGroups.set(accId, []);
-            accountGroups.get(accId)!.push(p);
+            const compositeKey = PortfolioMerger.getCompositeKey(p);
+            if (!accountGroups.has(compositeKey)) accountGroups.set(compositeKey, []);
+            accountGroups.get(compositeKey)!.push(p);
         });
 
-        const portfolios: UnifiedPortfolio[] = [];
+        const stitchedPortfolios: UnifiedPortfolio[] = [];
 
-        // ============================================================
-        // DETERMINISTIC ID-BASED GROUPING (replaces fuzzy NAV matching)
-        // ============================================================
-        // Step A: Group all portfolios by Account ID
-        // Step B: For same account, merge using "Latest Wins" priority
-        // Step C: Different accounts are summed (kept separate)
-        // ============================================================
-
-        for (const [accId, group] of accountGroups) {
+        // Process each unique account (provider::accountId combination)
+        for (const [compositeKey, group] of accountGroups) {
             if (group.length === 1) {
-                portfolios.push(group[0]);
+                // Single file for this account - add sources metadata
+                const single = group[0];
+                stitchedPortfolios.push({
+                    ...single,
+                    metadata: {
+                        ...single.metadata,
+                        sources: [{
+                            provider: single.metadata.provider,
+                            accountId: single.metadata.accountId || 'UNKNOWN',
+                            asOfDate: single.metadata.asOfDate
+                        }]
+                    }
+                });
                 continue;
             }
 
-            // Same account with multiple files -> STITCH (never sum)
-            // This handles: Manual uploads + Auto-sync, Historical + Recent, Duplicates
+            // Multiple files for same account -> STITCH (time-series extension)
+            // This handles: Historical + Recent uploads, Duplicates, Updates
 
 
             // Sort by asOfDate (oldest to newest) - newest file has highest priority
@@ -140,28 +161,47 @@ export class PortfolioMerger {
                 }
             }
 
-            // Create the stitched portfolio for this account
-            portfolios.push({
+            // Create the stitched portfolio for this account with sources traceability
+            stitchedPortfolios.push({
                 assets: consolidatedAssets,
-                cashBalance: latestFile.cashBalance, // Use latest snapshot's cash balance
+                cashBalance: latestFile.cashBalance,
                 baseCurrency: latestFile.baseCurrency,
                 transactions: allTransactions,
                 equityHistory: consolidatedHistory,
                 cashFlows: consolidatedCashFlows,
                 metadata: {
-                    provider: `STITCHED-${accId}`,
+                    provider: latestFile.metadata.provider, // Keep original provider
                     asOfDate: latestFile.metadata.asOfDate,
-                    accountId: accId
+                    accountId: latestFile.metadata.accountId || 'UNKNOWN',
+                    sources: group.map(p => ({
+                        provider: p.metadata.provider,
+                        accountId: p.metadata.accountId || 'UNKNOWN',
+                        asOfDate: p.metadata.asOfDate
+                    }))
                 }
             });
+
         }
 
-        // ============================================================
-        // At this point, `portfolios` contains:
-        // - One stitched portfolio per unique Account ID
-        // - Different accounts will be SUMMED in the aggregation below
-        // ============================================================
+        return stitchedPortfolios;
+    }
 
+    /**
+     * Phase 2: Sum multiple stitched accounts into one master portfolio.
+     * This aggregates different accounts (e.g., Main + Options, IBKR + Schwab).
+     */
+    private static async sumPortfolios(stitchedPortfolios: UnifiedPortfolio[], targetCurrency: string): Promise<MergeResult> {
+        if (stitchedPortfolios.length === 0) {
+            return {
+                portfolio: PortfolioMerger.createEmpty(targetCurrency),
+                warnings: []
+            };
+        }
+
+        // Note: Even for single portfolios, we must process through the full conversion logic
+        // because the portfolio's baseCurrency might match targetCurrency, but individual
+        // cash flows within it might still be in different currencies (e.g., portfolio base=USD
+        // but some cash flows are SGD). The early-exit would skip conversion and cause bugs.
 
         // 1. Prepare Aggregators
         let mergedAssets: Asset[] = [];
@@ -184,6 +224,10 @@ export class PortfolioMerger {
         // Cash Balance Aggregation
         let totalCashBalance = 0;
 
+        // Rate maps for FX conversion
+        const portfolioBaseRateMaps = new Map<number, Map<string, number>>(); // Index -> RateMap
+        const portfolioLatestRates = new Map<number, number>(); // Index -> Rate
+
         // 2. Determine Date Range for Bulk FX Fetching
         // We need rates for: Equity History (Daily), Cash Flows (Specific Dates).
         // Assets usually use "Latest" rate (Spot).
@@ -191,7 +235,7 @@ export class PortfolioMerger {
         let minDate = new Date(); // Start with "Now" and go back
         let maxDate = new Date(0); // Start with "Epoch" and go forward
 
-        portfolios.forEach(p => {
+        stitchedPortfolios.forEach(p => {
             if (p.equityHistory) {
                 p.equityHistory.forEach(e => {
                     const d = new Date(e.date);
@@ -214,13 +258,8 @@ export class PortfolioMerger {
         if (minDate > maxDate) minDate = new Date(Date.now() - 86400000 * 30); // 30 days back default
 
         // 3. Process each Portfolio
-        // We will store the rate maps used for Equity/Assets to reuse them for Cash Flows if needed
-        const portfolioBaseRateMaps = new Map<number, Map<string, number>>(); // Index -> RateMap
-        const portfolioLatestRates = new Map<number, number>(); // Index -> Rate
-
-        // Let's rewrite the main loop properly using `for...of` to support await
         let pIndex = 0;
-        for (const p of portfolios) {
+        for (const p of stitchedPortfolios) {
             const base = p.baseCurrency;
             let rateMap = new Map<string, number>();
             let latestRate = 1;
@@ -298,7 +337,7 @@ export class PortfolioMerger {
         // 3b. Perform Fill-Forward Merge of Equity History
         // Step 1: Collect all unique dates from all portfolios
         const allEquityDates = new Set<string>();
-        portfolios.forEach(p => {
+        stitchedPortfolios.forEach(p => {
             if (p.equityHistory) {
                 p.equityHistory.forEach(pt => allEquityDates.add(pt.date));
             }
@@ -308,14 +347,14 @@ export class PortfolioMerger {
         // Step 2: Iterate valid dates and sum NAVs (Filling Forward missing values)
         const lastKnownNavs = new Map<number, number>(); // PortfolioIndex -> LastNAV in Target Ccy
         // Initialize with zero
-        for (let i = 0; i < portfolios.length; i++) lastKnownNavs.set(i, 0);
+        for (let i = 0; i < stitchedPortfolios.length; i++) lastKnownNavs.set(i, 0);
 
         sortedDates.forEach(date => {
             let dailyTotal = 0;
 
             // For this date, update lastKnownNavs for any portfolio that has a datapoint
             // Then sum all lastKnownNavs
-            portfolios.forEach((p, idx) => {
+            stitchedPortfolios.forEach((p, idx) => {
                 // Find point for this date
                 // Optimization: p.equityHistory is likely sorted, but simple find is safer for now. 
                 // Given manageable size (~365 points), find is okay. Map would be faster.
@@ -344,10 +383,7 @@ export class PortfolioMerger {
         // But I need to ensure I removed the old logic inside the loop!
         // The `replace` block starts at "C. Merge Equity History".
         // I need to confirm I am replacing the block inside the loop OR removing it.
-        // Wait, the `replace_file_content` target IS inside the loop.
-        // If I put "BreaK loop" logic here it will break.
-        // I CANNOT change the loop structure easily with a chunk replacement if I am inside it.
-        // Actually, the previous tool call showed I am inside `for (const p of portfolios)`.
+        // Wait, the previous tool call showed I am inside `for (const p of portfolios)`.
         // To fix this cleanly:
         // 1. Inside the loop: Just collect the formatted history into a temp structure on `p`.
         // 2. Or, since I can't easily jump out, I will just NO-OP the equity merging inside the loop.
@@ -383,7 +419,7 @@ export class PortfolioMerger {
 
         // 1. Collect all unique currencies from all cash flows
         const flowCurrencies = new Set<string>();
-        portfolios.forEach(p => {
+        stitchedPortfolios.forEach(p => {
             if (p.cashFlows) {
                 p.cashFlows.forEach(cf => flowCurrencies.add(cf.currency));
             }
@@ -411,7 +447,7 @@ export class PortfolioMerger {
 
         // 3. Process Cash Flows using stored maps
         pIndex = 0;
-        for (const p of portfolios) {
+        for (const p of stitchedPortfolios) {
             const base = p.baseCurrency;
             const baseRateMap = portfolioBaseRateMaps.get(pIndex) || new Map<string, number>();
             const baseLatestRate = portfolioLatestRates.get(pIndex) || 1;
@@ -435,7 +471,7 @@ export class PortfolioMerger {
                             if (cf.currency === base) {
                                 rate = getRateWithLookback(baseRateMap, cf.date) || baseLatestRate;
                             } else {
-                                console.warn(`[PortfolioMerger] No specific FX rate found for cash flow ${cf.currency} to ${targetCurrency} on ${cf.date}. Using 1.`);
+                                console.warn(`[PortfolioMerger] No FX rate found for ${cf.currency} → ${targetCurrency}. Using 1.`);
                             }
                         }
                     }
@@ -502,6 +538,23 @@ export class PortfolioMerger {
             }
         }
 
+        // Collect all sources from stitched portfolios for traceability
+        // Each stitched portfolio represents ONE unique account, so we show it once
+        const allSources: Array<{ provider: string; accountId: string; asOfDate: string }> = [];
+        const accountKeys = new Set<string>();
+
+        stitchedPortfolios.forEach(p => {
+            const key = `${p.metadata.provider}::${p.metadata.accountId}`;
+            if (!accountKeys.has(key)) {
+                accountKeys.add(key);
+                allSources.push({
+                    provider: p.metadata.provider,
+                    accountId: p.metadata.accountId || 'UNKNOWN',
+                    asOfDate: p.metadata.asOfDate
+                });
+            }
+        });
+
         return {
             portfolio: {
                 assets: mergedAssets,
@@ -511,9 +564,10 @@ export class PortfolioMerger {
                 equityHistory: sortedHistory,
                 cashFlows: mergedCashFlows,
                 metadata: {
-                    provider: 'MERGED',
+                    provider: stitchedPortfolios.length === 1 ? stitchedPortfolios[0].metadata.provider : 'AGGREGATED',
                     asOfDate: new Date().toISOString().split('T')[0],
-                    accountId: 'ALL'
+                    accountId: stitchedPortfolios.length === 1 ? stitchedPortfolios[0].metadata.accountId : 'MULTI_ACCOUNT',
+                    sources: allSources
                 }
             },
             warnings

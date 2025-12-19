@@ -40,7 +40,11 @@ export async function POST(request: Request) {
         // Use IbkrProvider.fromParsedReport() to ensure identical processing as live token sync
         if (Array.isArray(manualHistory)) {
             const manualPortfolios = manualHistory.map((report: any) => {
-                return IbkrProvider.fromParsedReport(report, 'IBKR-Manual');
+                const portfolio = IbkrProvider.fromParsedReport(report, 'IBKR');
+                // Normalize provider label to ensure consistent composite keys
+                // This handles old localStorage data that may have been saved with 'IBKR-Manual'
+                portfolio.metadata.provider = 'IBKR';
+                return portfolio;
             });
             portfolios.push(...manualPortfolios);
         }
@@ -52,7 +56,8 @@ export async function POST(request: Request) {
                 try {
                     const xmlData = await fetchFlexReport(token, qId);
                     const unified = ibkrProvider.parse(xmlData);
-                    unified.metadata.provider = `IBKR-Live-${qId}`;
+                    // IMPORTANT: Use consistent provider label to ensure proper stitching
+                    unified.metadata.provider = 'IBKR';
                     portfolios.push(unified);
                 } catch (err) {
                     console.error(`Error fetching / parsing query ${qId}: `, err);
@@ -66,11 +71,10 @@ export async function POST(request: Request) {
         }
 
         // 2. Merge Step
-        logToFile('Merging portfolios...');
+
         const mergeResult = await PortfolioMerger.merge(portfolios, targetCurrency);
         const unified = mergeResult.portfolio;
         const mergeWarnings = mergeResult.warnings;
-        logToFile(`Merged Portfolio: Found ${unified.assets.length} assets, ${unified.cashFlows.length} cash flows.`);
         if (mergeWarnings.length > 0) {
             logToFile(`Merge Warnings: ${mergeWarnings.join('; ')}`);
         }
@@ -126,14 +130,17 @@ export async function POST(request: Request) {
             }
 
             // Convert CashFlows to Deposits
-            // Convert CashFlows to Deposits
+            // Note: unified.cashFlows.amount is ALREADY converted to targetCurrency by the merger
+            // The currency field should reflect this, not the original currency
+
             deposits = unified.cashFlows.map(c => ({
                 date: c.date,
-                amount: c.amount,
-                currency: c.originalCurrency || c.currency, // Use Original for 'currency' field to trigger 'Original' column in frontend
+                amount: c.amount, // Already in targetCurrency
+                currency: c.currency, // This is targetCurrency (set by merger at line 505)
                 type: c.type,
                 transactionId: c.id,
-                originalAmount: c.originalAmount,
+                originalAmount: c.originalAmount, // Original value before conversion
+                originalCurrency: c.originalCurrency, // Original currency (e.g., SGD)
                 description: c.description || (c.type === 'DEPOSIT' ? 'Deposit' : 'Withdrawal')
             }));
 

@@ -190,6 +190,12 @@ export interface UnifiedPortfolio {
         provider: string; // 'IBKR', 'SCHWAB'
         asOfDate: string;
         accountId?: string;
+        // Traceability: List of accounts that contributed to this portfolio (for aggregated portfolios)
+        sources?: Array<{
+            provider: string;
+            accountId: string;
+            asOfDate: string;
+        }>;
     };
 }
 
