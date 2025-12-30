@@ -105,7 +105,7 @@ export function GuideModal() {
                                         We do <strong className="text-foreground">not</strong> store your data.
                                     </p>
                                     <p>
-                                        Your portfolio history is processed safely in memory. It is never saved to a database.
+                                        Your portfolio history is processed safely in-memory. It is never saved to a database.
                                     </p>
                                     <p className="pt-2">
                                         Ready to see your true performance? <br />
