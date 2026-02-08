@@ -31,7 +31,7 @@
     "tailwind-merge": "^3.4.0",
     "xirr": "^1.1.0",
     "yahoo-finance2": "^3.13.0",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
