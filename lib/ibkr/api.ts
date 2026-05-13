@@ -1,14 +1,16 @@
 import { XMLParser } from 'fast-xml-parser';
 
-const BASE_URL = 'https://ndcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.SendRequest';
+const BASE_URL = 'https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService/SendRequest';
 const VERSION = '3';
 
 export async function fetchFlexReport(token: string, queryId: string): Promise<string> {
+    const headers = { 'User-Agent': 'BeatTheMarket/1.0' };
+
     // Step 1: Request the report generation
     const requestUrl = `${BASE_URL}?t=${token}&q=${queryId}&v=${VERSION}`;
     console.log(`Requesting Flex Report from: ${requestUrl.replace(token, 'REDACTED')}`);
 
-    const initResponse = await fetch(requestUrl);
+    const initResponse = await fetch(requestUrl, { headers });
     const initXml = await initResponse.text();
 
     if (!initResponse.ok) {
@@ -39,7 +41,7 @@ export async function fetchFlexReport(token: string, queryId: string): Promise<s
     let retryDelay = 1000; // start with 1s
 
     for (let i = 0; i < maxRetries; i++) {
-        const reportResponse = await fetch(reportUrl);
+        const reportResponse = await fetch(reportUrl, { headers });
         const reportXml = await reportResponse.text();
 
         if (!reportResponse.ok) {

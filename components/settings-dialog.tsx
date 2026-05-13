@@ -461,6 +461,20 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
                                             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                                                 <p className="font-medium text-foreground">Step 4: Configure Settings</p>
                                                 <p>Set Format to <strong>XML</strong> and Period to <strong>Last 365 Days</strong>. Save the query.</p>
+
+                                                {/* Account Alias Warning */}
+                                                <div className="flex gap-2 items-start text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 p-3 rounded border border-yellow-500/20 mt-2">
+                                                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                                                    <div className="space-y-2">
+                                                        <p><strong>Privacy Tip:</strong> We highly encourage toggling <strong>"Display Account Alias in Place of Account ID?"</strong> to <strong>Yes</strong>. This prevents your actual Account ID from being exported in the file.</p>
+                                                        <p>Please keep this setting consistent across all your exports. Changing it later may cause BeatTheMarket to treat new files as a completely different account.</p>
+                                                        <div className="bg-background rounded overflow-hidden mt-2 border border-yellow-500/20">
+                                                            <Image src="/images/guides/ibkr/ibkr-step-4-alias-light.png" alt="Toggle Account Alias" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
+                                                            <Image src="/images/guides/ibkr/ibkr-step-4-alias-dark.png" alt="Toggle Account Alias" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <div className="bg-background rounded overflow-hidden mt-2">
                                                     <Image src="/images/guides/ibkr/ibkr-step-4-settings-light.png" alt="Configure Settings" width={0} height={0} sizes="100vw" className="w-full h-auto dark:hidden" />
                                                     <Image src="/images/guides/ibkr/ibkr-step-4-settings-dark.png" alt="Configure Settings" width={0} height={0} sizes="100vw" className="w-full h-auto hidden dark:block" />

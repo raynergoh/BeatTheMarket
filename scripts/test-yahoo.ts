@@ -1,26 +1,18 @@
-const yahooFinance = require('yahoo-finance2').default;
+import YahooFinance from 'yahoo-finance2';
+
+const yahooFinance = new YahooFinance();
 
 async function testYahoo() {
-    console.log("Testing live fetch for SGD=X (USD -> SGD)...");
+    console.log("Testing live fetch for SGD=X (USD -> SGD) using chart()...");
     try {
-        const result = await yahooFinance.historical('SGD=X', {
+        const result = await yahooFinance.chart('SGD=X', {
             period1: '2024-01-01',
-            period2: '2024-12-31'
+            period2: '2024-12-31',
+            interval: '1d'
         });
-        console.log("Success! Sample data:", result.slice(0, 2));
+        console.log("Success! Sample data:", result.quotes.slice(0, 2));
     } catch (error: any) {
         console.error("Error:", error.message);
-    }
-
-    console.log("\nTesting live fetch for EURUSD=X (EUR -> USD)...");
-    try {
-        const result = await yahooFinance.historical('EURUSD=X', {
-            period1: new Date(Date.now() - 86400000 * 7),
-            period2: new Date(),
-        });
-        console.log("EURUSD=X Result:", result);
-    } catch (e: any) {
-        console.error("EURUSD=X Error:", e);
     }
 }
 

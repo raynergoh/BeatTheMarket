@@ -91,6 +91,13 @@ export function parseFlexReport(xmlContent: string): ParsedFlexReport {
         }
     }
 
+    // Deduplicate equitySummary by reportDate (later statements override earlier ones for the same date)
+    const equityMap = new Map<string, EquitySummary>();
+    for (const eq of equitySummary) {
+        equityMap.set(eq.reportDate, eq);
+    }
+    equitySummary = Array.from(equityMap.values());
+
     // Sort valid history by date ascending
     equitySummary.sort((a, b) => a.reportDate.localeCompare(b.reportDate));
 
@@ -98,6 +105,10 @@ export function parseFlexReport(xmlContent: string): ParsedFlexReport {
     const baseCurrency = flexStatements.length > 0 ? (flexStatements[0].accountCurrency || flexStatements[0].currencyCode || flexStatements[0].currency || 'USD') : 'USD';
     const fromDate = flexStatements.length > 0 ? formatIbkrDate(flexStatements[0].fromDate || '') : '';
     const toDate = flexStatements.length > 0 ? formatIbkrDate(flexStatements[0].toDate || '') : '';
+
+    const bestAccountId = equitySummary.length > 0 && equitySummary[0].accountId 
+        ? equitySummary[0].accountId 
+        : (flexStatements.length > 0 ? flexStatements[0].accountId : undefined);
 
     return {
         cashTransactions,
@@ -109,7 +120,7 @@ export function parseFlexReport(xmlContent: string): ParsedFlexReport {
         cashReports,
         transfers,
         securitiesInfo,
-        accountId: flexStatements.length > 0 ? flexStatements[0].accountId : undefined
+        accountId: bestAccountId
     };
 }
 
@@ -138,7 +149,7 @@ function parseEquitySummary(statement: any): EquitySummary[] {
                 total: parseFloat(item.total || item.netLiquidation || item.nav || item.amount || '0'),
                 cash: parseFloat(item.cash || '0'),
                 currency: item.currency || currency,
-                accountId: item.accountId || statement.accountId,
+                accountId: item.acctAlias || item.accountId || statement.accountId,
                 dividendAccruals: parseFloat(item.dividendAccruals || '0'),
                 interestAccruals: parseFloat(item.interestAccruals || '0')
             });
@@ -152,7 +163,7 @@ function parseEquitySummary(statement: any): EquitySummary[] {
             total: parseFloat(item.total),
             cash: parseFloat(item.cash || '0'),
             currency: item.currency || currency,
-            accountId: item.accountId || statement.accountId,
+            accountId: item.acctAlias || item.accountId || statement.accountId,
             dividendAccruals: parseFloat(item.dividendAccruals || '0'),
             interestAccruals: parseFloat(item.interestAccruals || '0')
         });

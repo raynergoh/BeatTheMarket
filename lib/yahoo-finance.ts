@@ -106,12 +106,14 @@ export async function getHistoricalPrices(
                         interval: '1d' as const,
                     };
 
-                    const result = await yahooFinance.historical(ticker, queryOptions) as any[];
+                    const result = await yahooFinance.chart(ticker, queryOptions);
 
-                    return result.map((quote: any) => ({
-                        date: quote.date.toISOString().split('T')[0],
-                        close: quote.close,
-                    }));
+                    return (result.quotes || [])
+                        .filter((quote: any) => quote.close !== null && quote.close !== undefined)
+                        .map((quote: any) => ({
+                            date: quote.date.toISOString().split('T')[0],
+                            close: quote.close,
+                        }));
                 } catch (error) {
                     console.error(`[YF] Failed to fetch historical data for ${ticker}:`, error);
                     throw error;
