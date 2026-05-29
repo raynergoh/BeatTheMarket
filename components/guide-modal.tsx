@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -20,11 +20,37 @@ export function GuideModal() {
 
     const totalSteps = 3;
 
+    useEffect(() => {
+        const hasSeenGuide = localStorage.getItem("has_seen_guide");
+        const ibkrToken = localStorage.getItem("ibkr_token");
+        const ibkrQueryId = localStorage.getItem("ibkr_query_id");
+        const manualHistoryStr = localStorage.getItem("ibkr_manual_history");
+
+        let hasSyncedBroker = false;
+        if (ibkrToken && ibkrQueryId) {
+            hasSyncedBroker = true;
+        }
+        if (manualHistoryStr) {
+            try {
+                const parsed = JSON.parse(manualHistoryStr);
+                if (parsed && parsed.length > 0) {
+                    hasSyncedBroker = true;
+                }
+            } catch (e) {}
+        }
+
+        // Auto-open if they haven't seen the guide AND haven't synced a broker yet
+        if (hasSeenGuide !== "true" && !hasSyncedBroker) {
+            setOpen(true);
+        }
+    }, []);
+
     const handleNext = () => {
         if (step < totalSteps - 1) {
             setStep(step + 1);
         } else {
             setOpen(false);
+            localStorage.setItem("has_seen_guide", "true");
             setStep(0); // Reset for next time
         }
     };
@@ -32,6 +58,7 @@ export function GuideModal() {
     const handleOpenChange = (newOpen: boolean) => {
         setOpen(newOpen);
         if (!newOpen) {
+            localStorage.setItem("has_seen_guide", "true");
             setTimeout(() => setStep(0), 300); // Reset after close animation
         }
     };
@@ -119,7 +146,10 @@ export function GuideModal() {
                 <DialogFooter className="flex justify-between items-center flex-row gap-2">
                     <Button
                         variant="ghost"
-                        onClick={() => setOpen(false)}
+                        onClick={() => {
+                            setOpen(false);
+                            localStorage.setItem("has_seen_guide", "true");
+                        }}
                         className="text-muted-foreground text-xs hover:text-foreground"
                     >
                         Skip Guide
