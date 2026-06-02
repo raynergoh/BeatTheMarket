@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Asset, OpenPosition } from '@/src/core/types';
+import { usePrivacy } from "@/components/privacy-context";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 
 interface HoldingsTableProps {
     holdings: (OpenPosition | Asset)[]; // Allow both for transition, or stricter Asset[]
@@ -25,6 +27,7 @@ interface HoldingsTableProps {
 }
 
 export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) {
+    const { isPrivacyMode } = usePrivacy();
     const [sortConfig, setSortConfig] = React.useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
 
     const sortedHoldings = React.useMemo(() => {
@@ -90,6 +93,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                             <p>Detailed view of all your current open positions and their performance.</p>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <PrivacyToggle />
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-2 sm:px-6">
@@ -140,10 +144,10 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
                                         {safeAvgCost.toLocaleString('en-US', { style: 'currency', currency: nativeCurrency })}
                                     </TableCell>
                                     <TableCell className="text-right font-medium">
-                                        {safeValue.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
+                                        {isPrivacyMode ? "****" : safeValue.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
                                     </TableCell>
                                     <TableCell className="text-right text-muted-foreground hidden md:table-cell">
-                                        {safeCostBasis.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
+                                        {isPrivacyMode ? "****" : safeCostBasis.toLocaleString('en-US', { style: 'currency', currency: displayCurrency })}
                                     </TableCell>
                                     <TableCell className={`text-right hidden sm:table-cell ${plPercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                         {plPercent >= 0 ? '+' : ''}{plPercent.toFixed(1)}%

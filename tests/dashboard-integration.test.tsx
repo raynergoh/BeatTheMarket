@@ -5,6 +5,7 @@ import { calculateComparison } from '../src/core/engine/benchmark';
 import { Deposit, BenchmarkPrice } from '../src/core/types';
 import { SummaryCards } from '../components/dashboard/summary-cards';
 import { PerformanceChart } from '../components/dashboard/performance-chart';
+import { PrivacyProvider } from '../components/privacy-context';
 import fs from 'fs';
 import path from 'path';
 
@@ -64,14 +65,16 @@ describe('Dashboard Integration (2025.xml)', () => {
 
     it('Net Deposits summary card renders non-zero number', () => {
         render(
-            <SummaryCards
-                netWorth={netWorth}
-                totalDeposited={totalDeposited}
-                benchmarkValue={latest?.benchmarkValue || 0}
-                selectedBenchmark="Simulated"
-                onBenchmarkChange={() => { }}
-                currencySymbol="USD"
-            />
+            <PrivacyProvider>
+                <SummaryCards
+                    netWorth={netWorth}
+                    totalDeposited={totalDeposited}
+                    benchmarkValue={latest?.benchmarkValue || 0}
+                    selectedBenchmark="Simulated"
+                    onBenchmarkChange={() => { }}
+                    currencySymbol="USD"
+                />
+            </PrivacyProvider>
         );
 
         // Check for "Deposited:" text
@@ -100,11 +103,13 @@ describe('Dashboard Integration (2025.xml)', () => {
         }));
 
         render(
-            <PerformanceChart
-                data={chartData}
-                selectedBenchmark="Simulated"
-                currencySymbol="USD"
-            />
+            <PrivacyProvider>
+                <PerformanceChart
+                    data={chartData}
+                    selectedBenchmark="Simulated"
+                    currencySymbol="USD"
+                />
+            </PrivacyProvider>
         );
 
         expect(screen.getByText('Performance History')).toBeInTheDocument();

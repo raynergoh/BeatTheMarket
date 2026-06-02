@@ -1,0 +1,117 @@
+﻿﻿Activity Statement,,,,2025-06-02 - 2026-05-31
+Name,,,,GOH YI HENG, RAYNER
+Account Information,,,,Account,Address,Account Category,Base Currency
+Account Information,,,DATA,50803370,SINGAPORE SINGAPORE  54  JANSEN ROAD,Cash,USD
+Account Overview,,,,,Cash,Stock,Fund,Funds in Transit,Interest Accruals,Dividend Accruals,Total
+Account Overview,,,DATA,Beginning Of The Period,0.00,373.30,238.19,0.00,0.00,0.00,611.49
+Account Overview,,,DATA,End Of The Period,4.93,454.71,259.02,0.00,0.00,0.00,718.67
+Account Overview,,,,Short Stock Collateral(Base Currency): 0.00 USD<br/>Short Stock Margin(Base Currency): 0.00 USD<br/>Option Margin(Base Currency): 0.00 USD<br/><br/>Note: <br/><ol><li>The cash column shows the balance excluding funds in the futures segment and reflects only other cash balances.</li><li>Futures column = Total futures equity (incl. cash).</li></ol>
+Cash Report,,,,,Total,Securities,Fund
+Cash Report,,Currency: SGD,HEADER_DATA,Starting Cash,0.00,0.00,0.00
+Cash Report,,Currency: SGD,HEADER_DATA,GST,-0.18,-0.18,0.0
+Cash Report,,Currency: SGD,HEADER_DATA,Dividends,23.08,23.08,0.0
+Cash Report,,Currency: SGD,HEADER_DATA,Net Trades (Sales),2.21,0.0,2.21
+Cash Report,,Currency: SGD,HEADER_DATA,Net Trades (Purchase),-16.81,0.0,-16.81
+Cash Report,,Currency: SGD,HEADER_DATA,Other,-2.0,-2.0,0.0
+Cash Report,,Currency: SGD,HEADER_DATA,Segment Transfer,0.0,-14.6,14.6
+Cash Report,,Currency: SGD,HEADER_DATA,Ending Cash,6.30,6.30,0.00
+Cash Report,,Currency: SGD,HEADER_DATA,Ending Settled Cash,6.30,6.30,0.00
+Cash Report,,,,"Notes:<br/><ol><li>Net Trades:<br/>Sales: Cash received from selling securities<br/>Purchases: Cash paid for buying securities</li><li>Other Fees: Including IPO fees, withdraw fees, bond custody fees and other expenses.</li><li>Futures are traded on margin; therefore, changes in futures positions are not shown in this module.</li><li>Withholding Tax: This refers to the tax automatically deducted from the cash dividends you receive from stocks or funds, in accordance with applicable tax rates.</li></ol>"
+Trades,,,,Symbol,Market,Exchange,Activity Type,Quantity,Trade Price,Amount,Transaction Fee,Other Tripartite fees,Settlement Fee,SEC Fee,Option Regulatory Fee,Stamp Duty,Transaction Levy,Clearing Fee,Trading Activity Fee,Exchange Fee,Future Regulatory Fee,Commission,Platform Fee,Option Settlement Fee,Subscription Fee,Redemption Fee,Switching Fee,PH Stock Transaction Tax,Tax Service Fee,AFRC Transaction Levy,Trading Tariff,Transaction Fee,Brokerage fee,Handing Fee,Securities Management Fee,Transfer Fees (CSDC),Transfer Fees (HKSCC),Stamp Duty On Stock Borrowing,Consolidated Audit Trail Fee,Processing Fee,CM DA SI Fee,DVP SI Fee,IPO Transaction Fee,IPO Process Fee,Ipo Settle Fee,IPO Channel Fee,GST,Realized P/L,Notes,Trade Time,Settle Date,Currency
+Trades,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),SG,,Sell,-1.5,1.47560,-2.21,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.08,,"2025-07-07
+22:04:45, GMT+8",2025-07-08,SGD
+Trades,Fund,,DATA,,SG,,Sell,-1.5,1.47560,-2.21,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.08,,"2025-07-07
+22:04:45, GMT+8",2025-07-08,SGD
+Trades,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),SG,,Buy,3.57,1.47800,5.27,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-08-04
+21:01:46, GMT+8",2025-08-05,SGD
+Trades,Fund,,DATA,,SG,,Buy,3.57,1.47800,5.27,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-08-04
+21:01:46, GMT+8",2025-08-05,SGD
+Trades,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),SG,,Buy,0.8,1.48080,1.18,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-09-05
+21:02:06, GMT+8",2025-09-08,SGD
+Trades,Fund,,DATA,,SG,,Buy,0.8,1.48080,1.18,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-09-05
+21:02:06, GMT+8",2025-09-08,SGD
+Trades,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),SG,,Buy,3.51,1.48460,5.21,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-11-05
+21:02:19, GMT+8",2025-11-06,SGD
+Trades,Fund,,DATA,,SG,,Buy,3.51,1.48460,5.21,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2025-11-05
+21:02:19, GMT+8",2025-11-06,SGD
+Trades,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),SG,,Buy,3.46,1.49020,5.15,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2026-02-05
+22:01:57, GMT+8",2026-02-06,SGD
+Trades,Fund,,DATA,,SG,,Buy,3.46,1.49020,5.15,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,,"2026-02-05
+22:01:57, GMT+8",2026-02-06,SGD
+Trades,Fund,,TOTAL,Total SG9999002760.SGD,,,,9.84,,14.60,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.08,,,,SGD
+Trades,Fund,,TOTAL,Total,,,,,,14.60,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.08,,,,SGD
+Trades,Fund,,TOTAL,Total(In Base),,,,,,11.44,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.06,,,,USD
+Trades,,,,"Note: <br/><ol><li>We calculate realized P&L using the FIFO (First In, First Out) method. This means that when you sell a position, we assume you're selling the earliest (oldest) shares you bought first.</li><li>Trades and fees for futures options (including Hong Kong index futures options) are shown together with other futures transactions in the "Transaction Details — Futures" module.</li></ol>"
+Holdings,,,,Symbol,Quantity,Cost Price,Close Price,Value,Unrealized P/L,Initial Margin,Maint Margin,Currency
+Holdings,Fund,,DATA,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC (SG9999002760.SGD),29.2,1.4638785,1.49650,43.70,0.95,0.00,0.00,SGD
+Holdings,Fund,,TOTAL,Total,29.2,,,43.70,0.95,0.00,0.00,SGD
+Holdings,Fund,,DATA,FULLERTON USD CASH "A" (USD) ACC (SGXZ99103178.USD),188.895,1.0929820,1.19005,224.79,18.34,0.00,0.00,USD
+Holdings,Fund,,TOTAL,Total,188.895,,,224.79,18.34,0.00,0.00,USD
+Holdings,Fund,,TOTAL,Total(In Base),218.095,,,259.02,19.08,0.00,0.00,USD
+Holdings,,,,Symbol,Quantity,Multiplier,Cost Price,Close Price,Value,Unrealized P/L,Initial Margin,Maint Margin,Currency
+Holdings,Stock,,DATA,Amova-STC Asia REIT (CFA.SI),490,1.0,1.0026122,0.79600,390.04,-101.24,0.00,0.00,SGD
+Holdings,Stock,,DATA,Q&M Dental (QC7.SI),300,1.0,0.4695333,0.63500,190.50,49.64,0.00,0.00,SGD
+Holdings,Stock,,TOTAL,Total,790,,,,580.54,-51.60,0.00,0.00,SGD
+Holdings,Stock,,TOTAL,Total(In Base),790,,,,454.71,-40.42,0.00,0.00,USD
+Holdings,,,,"Note:<br/><ol><li>The multiplier represents the fixed number used to calculate the total contract value by multiplying it with the price of the underlying asset in equity options or futures trading.</li><li>For certain private funds, the end-of-period market value includes estimated adjustments for Equalization to smooth the calculation of performance fees or allocations.</li></ol>"
+Dividends,,,,Date,Product,Symbol,Dividend Reinvestment Plan,Quantity/Gross Rate,Phase,Cash Dividends,Shares,Fees & Tax,Net Cash Value,Currency
+Dividends,,,DATA,2025-08-01,Stock,NikkoAM-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.005302/Share,Paid,2.60,0,,2.60,SGD
+Dividends,,,DATA,2025-08-01,Stock,NikkoAM-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002254/Share,Paid,1.10,0,,1.10,SGD
+Dividends,,,DATA,2025-08-01,Stock,NikkoAM-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.001091/Share,Paid,0.53,0,,0.53,SGD
+Dividends,,,DATA,2025-08-01,Stock,NikkoAM-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002053/Share,Paid,1.01,0,,1.01,SGD
+Dividends,,,DATA,2025-09-04,Stock,Q&M Dental (QC7.SI),,Quantity: 300<br/>Gross Rate: 0.004000/Share,Paid,1.20,0,,1.20,SGD
+Dividends,,,DATA,2025-11-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002185/Share,Paid,1.07,0,,1.07,SGD
+Dividends,,,DATA,2025-11-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.001488/Share,Paid,0.73,0,,0.73,SGD
+Dividends,,,DATA,2025-11-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.000558/Share,Paid,0.27,0,,0.27,SGD
+Dividends,,,DATA,2025-11-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.004518/Share,Paid,2.21,0,,2.21,SGD
+Dividends,,,DATA,2025-11-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.001851/Share,Paid,0.91,0,,0.91,SGD
+Dividends,,,DATA,2026-02-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.006010/Share,Paid,2.94,0,,2.94,SGD
+Dividends,,,DATA,2026-02-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.001500/Share,Paid,0.74,0,,0.74,SGD
+Dividends,,,DATA,2026-02-04,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002990/Share,Paid,1.47,0,,1.47,SGD
+Dividends,,,DATA,2026-03-26,Stock,Q&M Dental (QC7.SI),,Quantity: 300<br/>Gross Rate: 0.004200/Share,Paid,1.26,0,,1.26,SGD
+Dividends,,,DATA,2026-05-06,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.001027/Share,Paid,0.50,0,,0.50,SGD
+Dividends,,,DATA,2026-05-06,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.004048/Share,Paid,1.98,0,,1.98,SGD
+Dividends,,,DATA,2026-05-06,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002854/Share,Paid,1.40,0,,1.40,SGD
+Dividends,,,DATA,2026-05-06,Stock,Amova-STC Asia REIT (CFA.SI),,Quantity: 490<br/>Gross Rate: 0.002371/Share,Paid,1.16,0,,1.16,SGD
+Dividends,,,TOTAL,,,Total,,,Accruals/Paid,,,,0.00/23.08,SGD
+Dividends,,,TOTAL,,,Total(In Base),,,Accruals/Paid,,,,0.00/18.08,USD
+Dividends,,,,"Notes: Accrued Dividends refers to the expected amount of cash or number of shares you will receive after a company announces a dividend. Before the payment is made, the amount or shares will appear as “accrued.” Once the dividend is officially distributed, the cash will be credited to your account balance, or the shares will be added to your holdings."
+Others,,,,Date,Segment,Description,Amount,GST,Currency
+Others,,,DATA,2025-07-04,Securities,Custody Fee,-2.00,-0.18,SGD
+Others,,,TOTAL,,,Total,-2.00,-0.18,SGD
+Others,,,TOTAL,,,Total(In Base),-1.57,-0.14,USD
+Others,,,,"Note: <br/><ol><li>Other fees include IPO subscription fees, withdrawal fees, bond custody fees, and related charges.</li><li>Legal fees refer to charges incurred for letters issued by a lawyer regarding outstanding payments.</li></ol>"
+Segment Transfer,,,,Date,Securities,Fund,Currency
+Segment Transfer,,,DATA,2025-06-02~2026-05-31,2.22,-2.22,SGD
+Segment Transfer,,,DATA,2025-06-02~2026-05-31,-16.82,16.82,SGD
+Segment Transfer,,,TOTAL,Total,-14.60,14.60,SGD
+Segment Transfer,,,TOTAL,Total(In Base),-11.44,11.44,USD
+Segment Transfer,,,,"Note: Segment Transfer refers to the movement of funds within your account between different trading sections. It does not reduce your total account value. When you buy or sell products that share consolidated buying power, the system will transfer funds as needed."
+Financial Instrument Information,,,,Symbol,Issuer,Description,Multiplier,Expiry,Strike,Right
+Financial Instrument Information,Fund,,DATA,SG9999002760.SGD,,LIONGLOBAL SGD MONEY MARKET "A" (SGD) ACC,1.0,,,
+Financial Instrument Information,Fund,,DATA,SGXZ99103178.USD,,FULLERTON USD CASH "A" (USD) ACC,1.0,,,
+Financial Instrument Information,,,,Symbol,Issuer,Description,Multiplier,Expiry,Strike,Right
+Financial Instrument Information,Stock,,DATA,CFA.SI,,NikkoAM-STC Asia REIT,1.0,,,
+Financial Instrument Information,Stock,,DATA,QC7.SI,,Q&M Dental,1.0,,,
+Base Currency Exchange Rate,,,,Date,2026-05-31
+Base Currency Exchange Rate,,,HEADER_DATA,USD,1.0
+Base Currency Exchange Rate,,,HEADER_DATA,AUD,0.71714
+Base Currency Exchange Rate,,,HEADER_DATA,CAD,0.72461
+Base Currency Exchange Rate,,,HEADER_DATA,CHF,1.28012
+Base Currency Exchange Rate,,,HEADER_DATA,CNH,0.14788
+Base Currency Exchange Rate,,,HEADER_DATA,EUR,1.16554
+Base Currency Exchange Rate,,,HEADER_DATA,GBP,1.34560
+Base Currency Exchange Rate,,,HEADER_DATA,HKD,0.12760
+Base Currency Exchange Rate,,,HEADER_DATA,IDR,0.00006
+Base Currency Exchange Rate,,,HEADER_DATA,JPY,0.00628
+Base Currency Exchange Rate,,,HEADER_DATA,MXN,0.05764
+Base Currency Exchange Rate,,,HEADER_DATA,MYR,0.25186
+Base Currency Exchange Rate,,,HEADER_DATA,NOK,0.10801
+Base Currency Exchange Rate,,,HEADER_DATA,NZD,0.59720
+Base Currency Exchange Rate,,,HEADER_DATA,PLN,0.27547
+Base Currency Exchange Rate,,,HEADER_DATA,SEK,0.10841
+Base Currency Exchange Rate,,,HEADER_DATA,SGD,0.78326
+Base Currency Exchange Rate,,,HEADER_DATA,TRY,0.02179
+Base Currency Exchange Rate,,,,"Note: You can refer to the USD index table to view the exchange rate information as of the report cutoff date, with USD as the quote currency."
+"Notes: 1. Please examine the details in the monthly statement and promptly report any inaccuracy or discrepancy found to <a href="mailto:service@tigerbrokers.com.sg">service@tigerbrokers.com.sg</a> within 14 calendar days from the date of the statement. All the above details shall be deemed correct and conclusive if no written notice of objection is received by us within 14 days from the date of the monthly statement. 2. Tiger Brokers (Singapore) Pte Ltd is a member of Financial Institutions Dispute Resolution Centre (FIDReC), which is an independent and impartial institution specialising in the resolution of disputes between financial institutions and consumers. Unresolved issues can also be brought up to FIDReC at <a href="https://www.fidrec.com.sg" target="_blank">www.fidrec.com.sg</a> for mediation. 3. Information on our fees can be found at <a href="https://www.tigerbrokers.com.sg/commissions/fees" target="_blank">https://www.tigerbrokers.com.sg/commissions/fees</a> 4. Information regarding your account can be found in the Terms and Conditions at <a href="https://www.tigerbrokers.com.sg/info/terms-n-conditions" target="_blank">https://www.tigerbrokers.com.sg/info/terms-n-conditions</a> 5. Customer money and assets are deposited in trust and held in custody, respectively in accordance with the Securities and Futures (Licensing and Conduct of Business) Regulations, governing the protection of client money and assets.;  [1] TIGER BROKERS (HK) GLOBAL LIMITED AS THE PRINCIPAL",,,,
+TIGER BROKERS (SINGAPORE) PTE. LTD.   +65 6331 2277   WhatsApp +65 6331 2277  service@tigerbrokers.com.sg,,,,

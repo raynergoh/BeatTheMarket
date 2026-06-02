@@ -10,6 +10,8 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePrivacy } from "@/components/privacy-context";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 
 interface CashHoldingsProps {
     holdings: (Asset | OpenPosition)[];
@@ -20,6 +22,7 @@ import { useCurrency } from "@/components/currency-context";
 
 export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
     const { targetCurrency, currencySymbol } = useCurrency();
+    const { isPrivacyMode } = usePrivacy();
 
     // Filter for cash
     const cashPositions = React.useMemo(() => {
@@ -75,6 +78,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                             <p>Cash balances in different currencies converted to {targetCurrency}.</p>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <PrivacyToggle />
                 </div>
             </CardHeader>
             <CardContent className="px-2 sm:px-6">
@@ -94,10 +98,10 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                                     {item.currency}
                                 </TableCell>
                                 <TableCell className="text-right hidden sm:table-cell">
-                                    {item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {isPrivacyMode ? "****" : item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </TableCell>
                                 <TableCell className="text-right text-muted-foreground">
-                                    {currencySymbol}{item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {isPrivacyMode ? "****" : `${currencySymbol}${item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -105,7 +109,7 @@ export function CashHoldings({ holdings, totalNetWorth }: CashHoldingsProps) {
                             <TableCell>Total Cash</TableCell>
                             <TableCell className="text-right hidden sm:table-cell"></TableCell>
                             <TableCell className="text-right">
-                                {currencySymbol}{totalCash.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {isPrivacyMode ? "****" : `${currencySymbol}${totalCash.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                             </TableCell>
                         </TableRow>
                     </TableBody>

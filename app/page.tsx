@@ -46,11 +46,15 @@ interface PortfolioSummary {
 
 import { CurrencyProvider, useCurrency } from "@/components/currency-context";
 import { CurrencyDropdown } from "@/components/currency-dropdown";
+import { PrivacyProvider } from "@/components/privacy-context";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 
 export default function DashboardPage() {
   return (
     <CurrencyProvider>
-      <DashboardContent />
+      <PrivacyProvider>
+        <DashboardContent />
+      </PrivacyProvider>
     </CurrencyProvider>
   );
 }
@@ -218,6 +222,7 @@ function DashboardContent() {
             <div className="hidden xs:flex items-center gap-1 sm:gap-2">
               <ModeToggle />
               <GuideModal />
+              <PrivacyToggle />
             </div>
             <SettingsDialog onSettingsChanged={fetchData} />
 

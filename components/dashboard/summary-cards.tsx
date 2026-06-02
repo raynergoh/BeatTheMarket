@@ -12,6 +12,8 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePrivacy } from "@/components/privacy-context";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 
 interface SummaryCardsProps {
     netWorth: number;
@@ -38,6 +40,7 @@ export function SummaryCards({
     annualizedBenchmarkMwr = 0,
     currencySymbol = '$'
 }: SummaryCardsProps) {
+    const { isPrivacyMode } = usePrivacy();
     const pl = netWorth - totalDeposited;
     const alpha = mwr - benchmarkMwr;
     const annualizedAlpha = annualizedMwr - annualizedBenchmarkMwr;
@@ -48,13 +51,14 @@ export function SummaryCards({
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-2 sm:px-6">
                     <CardTitle className="text-xs sm:text-sm font-medium truncate">Portfolio Value</CardTitle>
                     <div className="flex items-center space-x-2 shrink-0">
+                        <PrivacyToggle />
                         <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     </div>
                 </CardHeader>
                 <CardContent className="px-2 sm:px-6">
-                    <div className="text-sm sm:text-2xl font-bold truncate">{currencySymbol}{netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="text-sm sm:text-2xl font-bold truncate">{isPrivacyMode ? "****" : `${currencySymbol}${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</div>
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                        Deposited: {currencySymbol}{totalDeposited.toLocaleString()}
+                        Deposited: {isPrivacyMode ? "****" : `${currencySymbol}${totalDeposited.toLocaleString()}`}
                     </p>
                 </CardContent>
             </Card>
@@ -69,7 +73,7 @@ export function SummaryCards({
                 </CardHeader>
                 <CardContent className="px-2 sm:px-6">
                     <div className={`text-sm sm:text-2xl font-bold truncate ${pl >= 0 ? "text-green-500" : "text-red-500"}`}>
-                        {pl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {isPrivacyMode ? "****" : `${pl >= 0 ? "+" : ""}${currencySymbol}${Math.abs(pl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -160,7 +164,7 @@ export function SummaryCards({
                     </div>
                 </CardHeader>
                 <CardContent className="px-2 sm:px-6">
-                    <div className="text-sm sm:text-2xl font-bold truncate" title={`${currencySymbol}${benchmarkValue.toLocaleString()}`}>{currencySymbol}{benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="text-sm sm:text-2xl font-bold truncate" title={isPrivacyMode ? "****" : `${currencySymbol}${benchmarkValue.toLocaleString()}`}>{isPrivacyMode ? "****" : `${currencySymbol}${benchmarkValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</div>
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         if invested in {selectedBenchmark === 'sp500' ? 'S&P 500' : selectedBenchmark.toUpperCase()}
                     </p>

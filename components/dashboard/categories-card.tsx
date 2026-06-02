@@ -18,6 +18,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { PrivacyToggle } from "@/components/privacy-toggle"
 
 interface CategoriesCardProps {
     data?: {
@@ -65,6 +66,7 @@ export function CategoriesCard({ data, currencySymbol = "$" }: CategoriesCardPro
                             </DropdownMenuContent>
                         </DropdownMenu>
                     )}
+                    <PrivacyToggle />
                 </CardTitle>
                 <CardDescription>Breakdown by {activeTab}</CardDescription>
             </CardHeader>

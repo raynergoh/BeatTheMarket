@@ -14,6 +14,8 @@ import { ChevronDown, DollarSign, TrendingDown, TrendingUp, Percent, HelpCircle,
 import { PortfolioData } from "@/src/core/types"
 import { DataVerificationDialog } from "./data-verification-dialog"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { usePrivacy } from "@/components/privacy-context"
+import { PrivacyToggle } from "@/components/privacy-toggle"
 
 export interface PerformanceChartProps {
     data: PortfolioData[];
@@ -32,6 +34,7 @@ export function PerformanceChart({
     currencySymbol = '$',
     targetCurrency = 'USD'
 }: PerformanceChartProps) {
+    const { isPrivacyMode } = usePrivacy();
     const [timeRange, setTimeRange] = React.useState<TimeRange>("ALL");
 
     const chartConfig = {
@@ -177,6 +180,7 @@ export function PerformanceChart({
                             currencySymbol={currencySymbol}
                             targetCurrency={targetCurrency}
                         />
+                        <PrivacyToggle />
                     </div>
                 </div>
                 {/* Mobile metrics view */}
@@ -228,6 +232,7 @@ export function PerformanceChart({
                                 axisLine={false}
                                 width={30}
                                 tickFormatter={(value) => {
+                                    if (isPrivacyMode) return "***";
                                     if (value >= 1000) {
                                         return `${Math.round(value / 1000)}k`;
                                     }
@@ -240,7 +245,7 @@ export function PerformanceChart({
                                     <ChartTooltipContent
                                         indicator="dot"
                                         labelFormatter={(value) => new Date(value).toLocaleDateString()}
-                                        formatter={(value) => `${currencySymbol}${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                        formatter={(value) => isPrivacyMode ? "****" : `${currencySymbol}${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                     />
                                 }
                             />

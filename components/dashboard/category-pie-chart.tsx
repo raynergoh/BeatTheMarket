@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/chart"
 
 import { CategoryData, useCategoryChartData } from "@/hooks/use-category-chart-data"
+import { usePrivacy } from "@/components/privacy-context"
 
 interface CategoryPieChartProps {
     title: string
@@ -19,12 +20,13 @@ interface CategoryPieChartProps {
 
 export function CategoryPieChart({ title, data, currencySymbol = "$" }: CategoryPieChartProps) {
     const { displayData, config, total } = useCategoryChartData(data)
+    const { isPrivacyMode } = usePrivacy();
 
     return (
         <div className="flex flex-col items-center justify-center gap-6">
             <ChartContainer config={config} className="mx-auto aspect-square max-h-[350px] w-full">
                 <PieChart>
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="name" hideLabel formatter={(value) => isPrivacyMode ? "****" : `${currencySymbol}${Number(value).toLocaleString()}`} />} />
                     <Pie
                         data={displayData}
                         dataKey="value"
@@ -48,7 +50,7 @@ export function CategoryPieChart({ title, data, currencySymbol = "$" }: Category
                                                 y={viewBox.cy}
                                                 className="fill-foreground text-3xl font-bold"
                                             >
-                                                {currencySymbol}{total >= 1000000 ? (total / 1000000).toFixed(2) + "M" : (total / 1000).toFixed(0) + "k"}
+                                                {isPrivacyMode ? "****" : `${currencySymbol}${total >= 1000000 ? (total / 1000000).toFixed(2) + "M" : (total / 1000).toFixed(0) + "k"}`}
                                             </tspan>
                                             <tspan
                                                 x={viewBox.cx}
@@ -78,7 +80,7 @@ export function CategoryPieChart({ title, data, currencySymbol = "$" }: Category
                             <span className="font-medium text-foreground truncate flex-1 min-w-0" title={item.name}>{item.name}</span>
                             <span className="text-muted-foreground flex-shrink-0">{percent}%</span>
                             <span className="font-mono text-muted-foreground w-[60px] sm:w-[90px] text-right flex-shrink-0">
-                                {currencySymbol}{item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                {isPrivacyMode ? "****" : `${currencySymbol}${item.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                             </span>
                         </div>
                     )

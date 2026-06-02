@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { CategoriesCard } from './categories-card'
+import { PrivacyProvider } from '../../components/privacy-context'
 
 const mockData = {
     sector: [
@@ -17,12 +18,12 @@ const mockData = {
 
 describe('CategoriesCard', () => {
     it('renders loading state when no data provided', () => {
-        render(<CategoriesCard data={undefined as any} />)
+        render(<PrivacyProvider><CategoriesCard data={undefined as any} /></PrivacyProvider>)
         expect(screen.getByText('Loading data...')).toBeInTheDocument()
     })
 
     it('renders sector tab by default and shows correct data', () => {
-        render(<CategoriesCard data={mockData} />)
+        render(<PrivacyProvider><CategoriesCard data={mockData} /></PrivacyProvider>)
 
         // Check Header
         expect(screen.getByText('Portfolio Allocation')).toBeInTheDocument()
@@ -37,7 +38,7 @@ describe('CategoriesCard', () => {
     })
 
     it('switches tabs correctly', () => {
-        render(<CategoriesCard data={mockData} />)
+        render(<PrivacyProvider><CategoriesCard data={mockData} /></PrivacyProvider>)
 
         const assetTab = screen.getByRole('button', { name: /asset/i })
         fireEvent.click(assetTab)
@@ -58,7 +59,7 @@ describe('CategoriesCard', () => {
                 { name: 'Tiny', value: 1 }, // 1/10001 < 0.001
             ]
         }
-        render(<CategoriesCard data={dataWithSmallItems} />)
+        render(<PrivacyProvider><CategoriesCard data={dataWithSmallItems} /></PrivacyProvider>)
 
         expect(screen.getByText('Big')).toBeInTheDocument()
         // "Tiny" should be grouped into "Others" or filtered out if we check the logic
