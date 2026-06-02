@@ -204,9 +204,9 @@ export class PortfolioMerger {
         // but some cash flows are SGD). The early-exit would skip conversion and cause bugs.
 
         // 1. Prepare Aggregators
-        let mergedAssets: Asset[] = [];
-        let mergedTransactions: CashTransaction[] = []; // Raw Transactions
-        let mergedCashFlows: Array<{
+        const mergedAssets: Asset[] = [];
+        const mergedTransactions: CashTransaction[] = []; // Raw Transactions
+        const mergedCashFlows: Array<{
             date: string;
             amount: number;
             type: 'DEPOSIT' | 'WITHDRAWAL';
@@ -261,7 +261,7 @@ export class PortfolioMerger {
         let pIndex = 0;
         for (const p of stitchedPortfolios) {
             const base = p.baseCurrency;
-            let rateMap = new Map<string, number>();
+            const rateMap = new Map<string, number>();
             let latestRate = 1;
 
             // Fetch Rates if needed

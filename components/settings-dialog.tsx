@@ -102,9 +102,9 @@ export function SettingsDialog({ onSettingsChanged }: SettingsDialogProps) {
     }
 
     const handleFilesSelected = async (files: File[]) => {
-        let allParsedData: any[] = []
+        const allParsedData: any[] = []
         let successCount = 0;
-        let skippedFiles: string[] = []
+        const skippedFiles: string[] = []
 
         // Get existing filenames
         const existingNames = new Set(manualFiles.map(f => f.fileName));

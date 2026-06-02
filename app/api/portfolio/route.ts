@@ -28,12 +28,12 @@ function logToFile(message: string) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { token, queryId, manualHistory, targetCurrency = 'USD' } = body;
+        const { token, queryId, manualHistory, targetCurrency = 'USD', benchmark = 'sp500' } = body;
 
         logToFile(`--- API CALL START: Target=${targetCurrency} ---`);
 
         // 1. Ingest Step: Collect UnifiedPortfolios from all sources
-        let portfolios: UnifiedPortfolio[] = [];
+        const portfolios: UnifiedPortfolio[] = [];
         const ibkrProvider = new IbkrProvider();
 
         // A. Manual History (previously parsed reports from localStorage)
@@ -80,8 +80,8 @@ export async function POST(request: Request) {
         }
 
         // 3. Engine Step: Benchmarking
-        // Need to calculate Comparison vs SPY (in Target Currency)
-        const benchmarkSymbol = 'SPY';
+        // Need to calculate Comparison vs Benchmark (in Target Currency)
+        const benchmarkSymbol = benchmark === 'qqq' ? 'QQQ' : 'SPY';
         // Need date range
         let comparison: any[] = [];
         let benchmarkValue = 0;

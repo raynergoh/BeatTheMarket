@@ -28,7 +28,7 @@ export function HoldingsTable({ holdings, totalValue = 0 }: HoldingsTableProps) 
     const [sortConfig, setSortConfig] = React.useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
 
     const sortedHoldings = React.useMemo(() => {
-        let sortableItems = [...holdings];
+        const sortableItems = [...holdings];
         if (sortConfig !== null) {
             sortableItems.sort((a, b) => {
                 const aVal = (a as any).marketValue ?? (a as any).value ?? 0;

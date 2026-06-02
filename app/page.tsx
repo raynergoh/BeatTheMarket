@@ -95,7 +95,8 @@ function DashboardContent() {
           token,
           queryId,
           manualHistory,
-          targetCurrency
+          targetCurrency,
+          benchmark: selectedBenchmark
         })
       });
 
@@ -125,7 +126,7 @@ function DashboardContent() {
 
   useEffect(() => {
     fetchData();
-  }, [targetCurrency]); // Re-fetch when currency changes
+  }, [targetCurrency, selectedBenchmark]); // Re-fetch when currency or benchmark changes
 
   // Format comparison data for chart
   const chartData = comparisonData.map(d => ({

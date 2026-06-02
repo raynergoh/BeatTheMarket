@@ -10,12 +10,12 @@ export function parseFlexReport(xmlContent: string): ParsedFlexReport {
     const parsed = parseXML(xmlContent);
     const flexStatements = toArray(parsed.FlexQueryResponse.FlexStatements?.FlexStatement);
 
-    let cashTransactions: CashTransaction[] = [];
-    let transfers: Transfer[] = [];
-    let securitiesInfo: SecurityInfo[] = [];
-    let openPositions: OpenPosition[] = [];
+    const cashTransactions: CashTransaction[] = [];
+    const transfers: Transfer[] = [];
+    const securitiesInfo: SecurityInfo[] = [];
+    const openPositions: OpenPosition[] = [];
     let equitySummary: EquitySummary[] = [];
-    let cashReports: CashReport[] = [];
+    const cashReports: CashReport[] = [];
 
     // Global Maps
     const securitiesMap = new Map<string, number>();
@@ -131,7 +131,7 @@ function parseEquitySummary(statement: any): EquitySummary[] {
 
     // Option A: EquitySummaryInBase
     let equityList = toArray(statement.EquitySummaryInBase?.EquitySummaryByReportDateInBase);
-    let currency = statement.EquitySummaryInBase?.currencyCode || statement.EquitySummaryInBase?.currency || 'USD';
+    const currency = statement.EquitySummaryInBase?.currencyCode || statement.EquitySummaryInBase?.currency || 'USD';
 
     // Fallback: Option B
     if (equityList.length === 0) {

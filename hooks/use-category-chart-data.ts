@@ -23,7 +23,7 @@ export function useCategoryChartData(items: CategoryData[] = []) {
     const total = items.reduce((sum, item) => sum + item.value, 0)
 
     // Filter out very small items (< 0.1%) or group them
-    let processedData = items.filter(i => (i.value / total) > 0.001).map(i => ({ ...i }));
+    const processedData = items.filter(i => (i.value / total) > 0.001).map(i => ({ ...i }));
     const others = items.filter(i => (i.value / total) <= 0.001)
 
     if (others.length > 0) {

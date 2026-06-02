@@ -36,7 +36,7 @@ describe('Dashboard Integration (2025.xml)', () => {
 
     // Simple mock: Price starts at 100 and increases by 1 every day
     const mockBenchmarkPrices: BenchmarkPrice[] = [];
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate);
     const stopDate = new Date(endDate);
     let price = 100;
 
