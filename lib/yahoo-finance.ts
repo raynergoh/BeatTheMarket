@@ -156,9 +156,8 @@ export async function getEnhancedStockData(tickers: string[]): Promise<Record<st
 
     const results: Record<string, EnhancedSymbolData> = {};
 
-    // Process sequentially through rate limiter (no longer using chunks/parallel processing)
-    // This ensures we don't overwhelm the API with concurrent requests
-    for (const ticker of tickers) {
+    // Process in parallel, relying on pLimit to handle concurrency
+    const promises = tickers.map(async (ticker) => {
         const cacheKey = `enhanced-${ticker}`;
 
         try {
@@ -229,7 +228,9 @@ export async function getEnhancedStockData(tickers: string[]): Promise<Record<st
             console.error(`[YF] Failed to fetch enhanced data for ${ticker} after retries:`, error);
             results[ticker] = { symbol: ticker };
         }
-    }
+    });
+
+    await Promise.all(promises);
 
     return results;
 }

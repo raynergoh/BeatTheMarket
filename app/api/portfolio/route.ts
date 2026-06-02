@@ -98,13 +98,40 @@ export async function POST(request: Request) {
                 : new Date(sortedFlows[0].date); // Fallback to cash flow if no equity history
             const endDate = new Date();
 
-            const spyData = await getHistoricalPrices(benchmarkSymbol, startDate, endDate);
+            // Extract unique symbols for enhanced data fetching
+            const uniqueSymbols = Array.from(new Set(unified.assets.map(a => a.symbol)));
+
+            // Gather option currencies
+            const optionCurrencies = new Set<string>();
+            portfolios.forEach(p => {
+                p.assets.forEach(a => {
+                    if (a.assetClass === 'OPTION') optionCurrencies.add(a.currency);
+                });
+            });
+
+            // Fire independent API requests concurrently
+            const spyDataPromise = getHistoricalPrices(benchmarkSymbol, startDate, endDate);
+            const ratesPromise = targetCurrency !== 'USD' 
+                ? getHistoricalFxRates('USD', targetCurrency, startDate, endDate) 
+                : Promise.resolve([]);
+            const enhancedDataPromise = getEnhancedStockData(uniqueSymbols);
+            
+            const optionRatesPromises = Array.from(optionCurrencies).map(c => 
+                getHistoricalFxRates(c, targetCurrency, new Date(Date.now() - 86400000 * 5), new Date())
+                    .then(r => ({ currency: c, rates: r }))
+            );
+
+            const [spyData, rates, enhancedData, optionRatesResults] = await Promise.all([
+                spyDataPromise,
+                ratesPromise,
+                enhancedDataPromise,
+                Promise.all(optionRatesPromises)
+            ]);
 
             // Normalize SPY to Target
             // We need USD -> Target rates
             let spyInTarget = spyData.map(d => ({ date: d.date, close: d.close }));
             if (targetCurrency !== 'USD') {
-                const rates = await getHistoricalFxRates('USD', targetCurrency, startDate, endDate);
                 const rateMap = new Map<string, number>();
                 rates.forEach(r => rateMap.set(r.date, r.rate));
 
@@ -224,30 +251,14 @@ export async function POST(request: Request) {
             // If we pass `targetCurrency` as `baseCurrency`, it asks for `Original -> Target` rates.
             // Safe!
             // Fetch Rates for Options.
-            const optionCurrencies = new Set<string>();
-            unified.assets.filter(a => a.assetClass === 'OPTION').forEach(a => {
-                // We need original currency. But we lost it in `UnifiedPortfolio.assets` (overwritten to Target).
-                // `getCollateralValue` uses captured `p.currency`.
-                // We can't know `p.currency` from `a` anymore.
-                // WE NEED TO FETCH RATES FOR ALL POTENTIAL CURRENCIES? 
-                // Or we iterate `portfolios` (source) to find option currencies?
-                // Or we assume standard majors.
-                // Or we update `PortfolioMerger` to preserve `originalCurrency`.
-                // I will update `PortfolioMerger` (Step 4c was done, but I missed this).
-                // Workaround: Loop through `portfolios` (inputs) to collect Option Currencies.
-            });
 
-            portfolios.forEach(p => {
-                p.assets.forEach(a => {
-                    if (a.assetClass === 'OPTION') optionCurrencies.add(a.currency);
-                });
-            });
 
             const optionRates = new Map<string, number>();
-            for (const c of Array.from(optionCurrencies)) {
-                const r = await getHistoricalFxRates(c, targetCurrency, new Date(Date.now() - 86400000 * 5), new Date());
-                if (r.length > 0) optionRates.set(c, r[r.length - 1].rate);
-            }
+            optionRatesResults.forEach(({ currency, rates }) => {
+                if (rates.length > 0) {
+                    optionRates.set(currency, rates[rates.length - 1].rate);
+                }
+            });
 
             // Benchmark uses pure deposits (no synthetic collateral adjustment)
             comparison = calculateComparison(deposits, spyInTarget);
@@ -281,8 +292,6 @@ export async function POST(request: Request) {
 
             // 5. Allocations
             // unified.assets are in Target Currency.
-            const uniqueSymbols = Array.from(new Set(unified.assets.map(a => a.symbol)));
-            const enhancedData = await getEnhancedStockData(uniqueSymbols);
             const categories = calculateAllocations(unified.assets, enhancedData);
 
             // Calculate Net Worth for use in holdings % calculation
